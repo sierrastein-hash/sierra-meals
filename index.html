@@ -1,0 +1,3795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>cycle synced meal plan</title>
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.0.3/src/regular/style.css" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #faf7f2;
+    color: #2d2a26;
+    padding: 48px 36px;
+    min-height: 100vh;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-size: 36px;
+    color: #2d2a26;
+    margin-bottom: 6px;
+    text-transform: lowercase;
+  }
+
+  .subtitle {
+    font-size: 15px;
+    color: #8a8580;
+    margin-bottom: 12px;
+  }
+
+  .macro-targets {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-bottom: 36px;
+    padding: 16px 20px;
+    background: #f5f0ea;
+    border-radius: 12px;
+  }
+  .macro-pill {
+    font-size: 13px;
+    font-weight: 600;
+    color: #6b6560;
+  }
+  .macro-pill span {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: #2d2a26;
+    margin-right: 3px;
+  }
+
+  .tab-nav {
+    display: flex;
+    gap: 0;
+    border-bottom: 2px solid #eee8e0;
+    margin-bottom: 32px;
+    overflow-x: auto;
+  }
+  .tab {
+    padding: 10px 20px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #8a8580;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-top: none;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .tab:hover { color: #6b6560; }
+  .tab.active-planner { color: #5b21b6; border-bottom-color: #5b21b6; }
+  .tab.active-menstrual { color: #9d174d; border-bottom-color: #9d174d; }
+  .tab.active-follicular { color: #065f46; border-bottom-color: #065f46; }
+  .tab.active-ovulatory { color: #92400e; border-bottom-color: #92400e; }
+  .tab.active-luteal { color: #5b21b6; border-bottom-color: #5b21b6; }
+  .tab.active-prep { color: #1e40af; border-bottom-color: #1e40af; }
+  .tab.active-log { color: #0d9488; border-bottom-color: #0d9488; }
+
+  .phase-content { display: none; }
+  .phase-content.active { display: block; }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 8px;
+  }
+  .phase-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .phase-icon i { font-size: 22px; line-height: 1; }
+  .phase-title {
+    font-family: 'Fraunces', serif;
+    font-size: 24px;
+  }
+  .phase-desc {
+    font-size: 14px;
+    color: #6b6560;
+    margin-bottom: 28px;
+    line-height: 1.6;
+    max-width: 700px;
+  }
+
+  .menstrual .phase-icon { background: #fce7f3; }
+  .menstrual .phase-icon i { color: #9d174d; }
+  .menstrual .phase-title { color: #9d174d; }
+
+  .follicular .phase-icon { background: #d1fae5; }
+  .follicular .phase-icon i { color: #065f46; }
+  .follicular .phase-title { color: #065f46; }
+
+  .ovulatory .phase-icon { background: #ffedd5; }
+  .ovulatory .phase-icon i { color: #9a3412; }
+  .ovulatory .phase-title { color: #9a3412; }
+
+  .luteal .phase-icon { background: #ede9fe; }
+  .luteal .phase-icon i { color: #5b21b6; }
+  .luteal .phase-title { color: #5b21b6; }
+
+  .day-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .day-btn {
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid #d4cfc8;
+    background: white;
+    color: #6b6560;
+    font-family: 'DM Sans', sans-serif;
+    transition: all 0.2s;
+  }
+  .menstrual .day-btn.active { background: #fce7f3; border-color: #fce7f3; color: #9d174d; }
+  .follicular .day-btn.active { background: #d1fae5; border-color: #d1fae5; color: #065f46; }
+  .ovulatory .day-btn.active { background: #ffedd5; border-color: #ffedd5; color: #9a3412; }
+  .luteal .day-btn.active { background: #ede9fe; border-color: #ede9fe; color: #5b21b6; }
+
+  .day-plan { display: none; }
+  .day-plan.active { display: block; }
+
+  .meal-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 12px;
+    border: 1px solid #eee8e0;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px;
+    align-items: start;
+  }
+  .meal-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a8580;
+    margin-bottom: 4px;
+  }
+  .meal-name {
+    font-size: 16px;
+    font-weight: 700;
+    color: #2d2a26;
+    margin-bottom: 6px;
+  }
+  .meal-details {
+    font-size: 14px;
+    color: #6b6560;
+    line-height: 1.6;
+  }
+  .meal-details .arrow { color: #8a8580; }
+  .meal-macros {
+    text-align: right;
+    white-space: nowrap;
+    padding-top: 16px;
+  }
+  .meal-cal {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: #2d2a26;
+    line-height: 1;
+  }
+  .meal-cal-label {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #a8a29e;
+    margin-bottom: 6px;
+  }
+  .meal-macro-row {
+    font-size: 12px;
+    color: #8a8580;
+    margin-top: 2px;
+  }
+  .meal-macro-row strong {
+    color: #6b6560;
+    font-weight: 600;
+  }
+
+  .day-total {
+    background: #f5f0ea;
+    border-radius: 12px;
+    padding: 16px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .day-total-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #2d2a26;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .day-total-macros {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .day-total-macros .dt-item {
+    font-size: 13px;
+    color: #6b6560;
+  }
+  .day-total-macros .dt-item strong {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: #2d2a26;
+    margin-right: 2px;
+  }
+
+  .prep-section { margin-top: 0; }
+  .prep-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+  .prep-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px 24px;
+    border: 1px solid #eee8e0;
+  }
+  .prep-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #2d2a26;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .prep-card-title i { color: #1e40af; font-size: 18px; }
+  .prep-item {
+    font-size: 14px;
+    color: #6b6560;
+    line-height: 1.8;
+    padding-left: 4px;
+  }
+  .prep-item .arrow { color: #8a8580; }
+
+  .prep-phase-header {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: #2d2a26;
+    margin-bottom: 14px;
+    margin-top: 28px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #eee8e0;
+  }
+
+  .grocery-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .grocery-card {
+    background: white;
+    border-radius: 12px;
+    padding: 18px 22px;
+    border: 1px solid #eee8e0;
+  }
+  .grocery-card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    margin-bottom: 10px;
+  }
+  .grocery-item {
+    font-size: 14px;
+    color: #6b6560;
+    line-height: 1.8;
+  }
+
+  .notes-section {
+    background: #f5f0ea;
+    border-radius: 12px;
+    padding: 24px 28px;
+    margin-top: 28px;
+  }
+  .notes-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: #2d2a26;
+    margin-bottom: 12px;
+  }
+  .notes-item {
+    font-size: 14px;
+    color: #6b6560;
+    line-height: 1.8;
+  }
+
+  /* Planner styles */
+  /* ===== PLANNER ===== */
+  .planner-split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #eee8e0;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+  .planner-left {
+    padding: 20px;
+    border-right: 1px solid #eee8e0;
+    overflow-y: auto;
+    max-height: 80vh;
+  }
+  .planner-right {
+    padding: 20px;
+    background: #faf7f2;
+    overflow-y: auto;
+    max-height: 80vh;
+  }
+  .planner-right-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #b8b3ad;
+    font-size: 14px;
+    text-align: center;
+    padding: 40px;
+  }
+  .planner-section { }
+
+  .cal-grid {
+    display: grid;
+    grid-template-columns: auto repeat(7, 1fr);
+    gap: 0;
+    margin-bottom: 12px;
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eee8e0;
+    overflow: hidden;
+  }
+  .cal-header {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    text-align: center;
+    padding: 12px 8px;
+    border-bottom: 2px solid #eee8e0;
+  }
+  .cal-row-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b6560;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #f5f0ea;
+    white-space: nowrap;
+  }
+  .cal-cell {
+    text-align: center;
+    padding: 8px 4px;
+    border-bottom: 1px solid #f5f0ea;
+    border-left: 1px solid #f5f0ea;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .cal-cell:last-child { }
+  .cal-phase-select {
+    width: 100%;
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    padding: 6px 2px;
+    border: 1.5px solid #d4cfc8;
+    border-radius: 6px;
+    color: #6b6560;
+    background: white;
+    cursor: pointer;
+    text-align: center;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+  .cal-phase-select:focus { outline: none; border-color: #5b21b6; }
+  .cal-phase-select.ph-menstrual { border-color: #f9a8d4; background: #fff1f8; color: #9d174d; }
+  .cal-phase-select.ph-follicular { border-color: #6ee7b7; background: #ecfdf5; color: #065f46; }
+  .cal-phase-select.ph-ovulatory { border-color: #fdba74; background: #fff7ed; color: #9a3412; }
+  .cal-phase-select.ph-luteal { border-color: #c4b5fd; background: #f5f3ff; color: #5b21b6; }
+  .cal-check {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid #d4cfc8;
+    background: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .cal-check.checked { background: #ede9fe; border-color: #c4b5fd; }
+  .cal-check.checked svg { display: block; }
+  .cal-check svg { display: none; fill: #5b21b6; width: 14px; height: 14px; }
+  .cal-check.checked.ph-menstrual { background: #fce7f3; border-color: #f9a8d4; }
+  .cal-check.checked.ph-menstrual svg { fill: #9d174d; }
+  .cal-check.checked.ph-follicular { background: #d1fae5; border-color: #6ee7b7; }
+  .cal-check.checked.ph-follicular svg { fill: #065f46; }
+  .cal-check.checked.ph-ovulatory { background: #ffedd5; border-color: #fdba74; }
+  .cal-check.checked.ph-ovulatory svg { fill: #9a3412; }
+  .cal-check.checked.ph-luteal { background: #ede9fe; border-color: #c4b5fd; }
+  .cal-check.checked.ph-luteal svg { fill: #5b21b6; }
+
+  .cal-checkall {
+    font-size: 10px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: #8a8580;
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    border: 1.5px solid #d4cfc8;
+    background: white;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+  .cal-checkall:hover { border-color: #8a8580; color: #6b6560; }
+  .cal-checkall.all-checked { background: #ede9fe; border-color: #c4b5fd; color: #5b21b6; }
+  .cal-checkall.ph-menstrual { border-color: #f9a8d4; color: #9d174d; }
+  .cal-checkall.ph-menstrual.all-checked { background: #fce7f3; border-color: #f9a8d4; color: #9d174d; }
+  .cal-checkall.ph-follicular { border-color: #6ee7b7; color: #065f46; }
+  .cal-checkall.ph-follicular.all-checked { background: #d1fae5; border-color: #6ee7b7; color: #065f46; }
+  .cal-checkall.ph-ovulatory { border-color: #fdba74; color: #9a3412; }
+  .cal-checkall.ph-ovulatory.all-checked { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
+  .cal-checkall.ph-luteal { border-color: #c4b5fd; color: #5b21b6; }
+  .cal-checkall.ph-luteal.all-checked { background: #ede9fe; border-color: #c4b5fd; color: #5b21b6; }
+
+  .generate-btn {
+    padding: 10px 22px;
+    background: #5b21b6;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-block;
+    margin-top: 4px;
+  }
+  .generate-btn:hover { background: #4c1a8a; }
+  .generate-btn:active { transform: scale(0.98); }
+
+  .validation-error { color: #dc2626; font-size: 13px; margin-top: 8px; display: none; }
+  .validation-error.show { display: block; }
+
+  /* Day picker */
+  .day-pickers { margin-top: 0; display: none; }
+  .day-pickers.active { display: block; }
+  .day-pickers-title {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: #2d2a26;
+    margin-bottom: 2px;
+  }
+  .day-pickers-subtitle { font-size: 11px; color: #8a8580; margin-bottom: 10px; }
+  .day-picker-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #eee8e0;
+    padding: 12px 14px;
+    margin-bottom: 8px;
+  }
+  .day-picker-phase-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .day-picker-phase-label.menstrual { color: #9d174d; }
+  .day-picker-phase-label.follicular { color: #065f46; }
+  .day-picker-phase-label.ovulatory { color: #9a3412; }
+  .day-picker-phase-label.luteal { color: #5b21b6; }
+  .day-picker-servings {
+    font-size: 11px;
+    font-weight: 600;
+    color: #5b21b6;
+    background: #ede9fe;
+    padding: 3px 8px;
+    border-radius: 20px;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .day-picker-options { display: flex; gap: 6px; }
+  .day-picker-opt {
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1.5px solid #d4cfc8;
+    background: white;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    color: #6b6560;
+    cursor: pointer;
+    transition: all 0.15s;
+    flex: 1;
+    min-width: 0;
+  }
+  .day-picker-opt:hover { border-color: #8a8580; }
+  .day-picker-opt.selected { border-color: #5b21b6; background: #f5f3ff; color: #5b21b6; }
+  .day-picker-opt-title { font-weight: 700; font-size: 13px; margin-bottom: 3px; }
+  .day-picker-opt.selected .day-picker-opt-title { color: #5b21b6; }
+  .day-picker-opt-meals { font-size: 11px; line-height: 1.5; color: #8a8580; }
+  .day-picker-opt.selected .day-picker-opt-meals { color: #7c3aed; }
+  .day-picker-opt-macros {
+    font-size: 10px;
+    color: #a8a29e;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid #f5f0ea;
+    font-weight: 500;
+  }
+  .day-picker-opt.selected .day-picker-opt-macros { color: #7c3aed; }
+
+  /* Macro tracker bar */
+  .macro-tracker {
+    background: #f5f0ea;
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    display: none;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+  }
+  .macro-tracker.active { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .macro-tracker-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+  }
+  .macro-tracker-pill {
+    font-size: 12px;
+    font-weight: 600;
+    color: #2d2a26;
+  }
+  .macro-tracker-pill span { font-family: 'Fraunces', serif; font-size: 14px; margin-right: 2px; }
+  .macro-tracker-pill.warn { color: #dc2626; }
+  .macro-tracker-pill.ok { color: #065f46; }
+
+  /* Results */
+  .results-section { margin-top: 0; display: none; }
+  .results-section.active { display: block; }
+  .results-title {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: #2d2a26;
+    margin-bottom: 12px;
+  }
+  .result-meal-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #eee8e0;
+    padding: 14px 18px;
+    margin-bottom: 8px;
+  }
+  .result-meal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+  }
+  .result-meal-type {
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #8a8580;
+  }
+  .result-meal-servings { font-size: 12px; color: #5b21b6; font-weight: 600; }
+  .result-meal-name { font-size: 16px; font-weight: 700; color: #2d2a26; margin-bottom: 6px; }
+  .result-meal-details { font-size: 14px; color: #6b6560; line-height: 1.7; }
+  .result-meal-details .arrow { color: #8a8580; }
+  .result-meal-macros-row {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f5f0ea;
+    font-size: 12px;
+    color: #8a8580;
+  }
+  .result-meal-macros-row strong { color: #2d2a26; font-weight: 600; }
+
+  .grocery-section { margin-top: 0; display: none; }
+  .grocery-section.active { display: block; }
+  .grocery-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .grocery-title {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    color: #2d2a26;
+  }
+  .grocery-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+  .grocery-action-btn {
+    padding: 6px 12px;
+    border-radius: 18px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: 1.5px solid #d4cfc8;
+    background: white;
+    color: #6b6560;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .grocery-action-btn:hover { border-color: #5b21b6; color: #5b21b6; }
+  .grocery-action-btn.copied { border-color: #065f46; color: #065f46; background: #ecfdf5; }
+  .grocery-action-btn.sent { border-color: #065f46; color: #065f46; background: #ecfdf5; }
+  .grocery-categories {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .grocery-category-card {
+    background: white;
+    border-radius: 10px;
+    padding: 14px 16px;
+    border: 1px solid #eee8e0;
+  }
+  .grocery-category-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    margin-bottom: 8px;
+  }
+  .grocery-list-item {
+    font-size: 13px;
+    color: #6b6560;
+    line-height: 1.5;
+    padding: 3px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .grocery-list-item.crossed .grocery-item-text {
+    text-decoration: line-through;
+    color: #c4c0ba;
+  }
+  .grocery-item-check {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    border: 1.5px solid #d4cfc8;
+    background: white;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+  }
+  .grocery-list-item.crossed .grocery-item-check {
+    background: #065f46;
+    border-color: #065f46;
+  }
+  .grocery-item-check svg { display: none; width: 12px; height: 12px; fill: white; }
+  .grocery-list-item.crossed .grocery-item-check svg { display: block; }
+  .grocery-item-text { flex: 1; }
+
+  /* Prep day guide */
+  .prep-guide-section { margin-top: 36px; display: none; }
+  .prep-guide-section.active { display: block; }
+  .prep-guide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .prep-guide-title {
+    font-family: 'Fraunces', serif;
+    font-size: 20px;
+    color: #2d2a26;
+  }
+  .prep-guide-subtitle {
+    font-size: 13px;
+    color: #8a8580;
+    margin-bottom: 24px;
+  }
+  .prep-timeline { position: relative; padding-left: 28px; }
+  .prep-timeline::before {
+    content: '';
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: #eee8e0;
+  }
+  .prep-step {
+    position: relative;
+    margin-bottom: 20px;
+    padding-bottom: 4px;
+  }
+  .prep-step-dot {
+    position: absolute;
+    left: -24px;
+    top: 6px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid #d4cfc8;
+    background: white;
+  }
+  .prep-step.active-step .prep-step-dot { border-color: #5b21b6; background: #ede9fe; }
+  .prep-step.oven .prep-step-dot { border-color: #fdba74; background: #fff7ed; }
+  .prep-step.stovetop .prep-step-dot { border-color: #f9a8d4; background: #fff1f8; }
+  .prep-step.cold .prep-step-dot { border-color: #6ee7b7; background: #ecfdf5; }
+  .prep-step.assembly .prep-step-dot { border-color: #c4b5fd; background: #f5f3ff; }
+  .prep-step-time {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    margin-bottom: 4px;
+  }
+  .prep-step-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #2d2a26;
+    margin-bottom: 3px;
+  }
+  .prep-step-detail {
+    font-size: 13px;
+    color: #8a8580;
+    line-height: 1.5;
+  }
+  .prep-step-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-top: 4px;
+  }
+  .prep-step.oven .prep-step-tag { background: #fff7ed; color: #9a3412; }
+  .prep-step.stovetop .prep-step-tag { background: #fff1f8; color: #9d174d; }
+  .prep-step.cold .prep-step-tag { background: #ecfdf5; color: #065f46; }
+  .prep-step.assembly .prep-step-tag { background: #f5f3ff; color: #5b21b6; }
+
+  .prep-claude-card {
+    background: #f5f0ea;
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-top: 24px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .prep-claude-card-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: #ede9fe;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .prep-claude-card-icon svg { width: 20px; height: 20px; fill: #5b21b6; }
+  .prep-claude-text { flex: 1; min-width: 200px; }
+  .prep-claude-title { font-size: 14px; font-weight: 600; color: #2d2a26; margin-bottom: 2px; }
+  .prep-claude-desc { font-size: 13px; color: #8a8580; }
+
+  /* Daily log */
+  .log-section { }
+  .log-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .log-date-btn {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 1.5px solid #d4cfc8; background: white;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #6b6560; transition: all 0.15s;
+  }
+  .log-date-btn:hover { border-color: #0d9488; color: #0d9488; }
+  .log-date-display {
+    font-family: 'Fraunces', serif;
+    font-size: 18px;
+    color: #2d2a26;
+  }
+  .log-split {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    align-items: start;
+  }
+  .log-meals { }
+  .log-meal-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #eee8e0;
+    padding: 14px 16px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .log-meal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee8e0;
+  }
+  .log-meal-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8a8580;
+  }
+  .log-meal-cals {
+    font-size: 12px;
+    font-weight: 600;
+    color: #0d9488;
+    font-family: 'Fraunces', serif;
+  }
+  .log-items {
+    min-height: 0;
+    margin-bottom: 8px;
+  }
+  .log-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    font-size: 12px;
+    color: #2d2a26;
+    border-bottom: 1px solid #f5f2ed;
+  }
+  .log-item:last-child { border-bottom: none; }
+  .log-item-name { flex: 1; }
+  .log-item-macros {
+    font-size: 10px;
+    color: #a8a29e;
+    font-family: 'Fraunces', serif;
+    margin: 0 8px;
+    white-space: nowrap;
+  }
+  .log-item-remove {
+    background: none;
+    border: none;
+    color: #d4cfc8;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s;
+  }
+  .log-item-remove:hover { color: #dc2626; }
+  .log-add-food-btn {
+    width: 100%;
+    padding: 8px;
+    border-radius: 6px;
+    border: 1.5px dashed #eee8e0;
+    background: #faf7f2;
+    color: #8a8580;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .log-add-food-btn:hover { border-color: #0d9488; color: #0d9488; }
+
+  .log-add-food-panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #eee8e0;
+    border-radius: 12px 12px 0 0;
+    padding: 16px;
+    max-height: 70vh;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+  }
+  .log-add-food-panel.open { display: block; }
+  .log-add-food-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #eee8e0;
+  }
+  .log-add-food-title {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #2d2a26;
+  }
+  .log-add-food-close {
+    background: none;
+    border: none;
+    font-size: 18px;
+    color: #d4cfc8;
+    cursor: pointer;
+    transition: color 0.15s;
+  }
+  .log-add-food-close:hover { color: #8a8580; }
+
+  .log-panel-section {
+    margin-bottom: 16px;
+  }
+  .log-panel-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    margin-bottom: 8px;
+  }
+  .log-quick-picks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .log-quick-pick {
+    padding: 6px 10px;
+    border-radius: 12px;
+    border: 1px solid #eee8e0;
+    background: #faf7f2;
+    font-size: 10px;
+    color: #6b6560;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .log-quick-pick:hover { background: #e8e4dd; border-color: #0d9488; }
+  .log-quick-pick span { display: block; font-size: 9px; color: #a8a29e; margin-top: 2px; }
+
+  .log-search-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1.5px solid #eee8e0;
+    border-radius: 6px;
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    color: #2d2a26;
+    background: #faf7f2;
+    transition: border-color 0.15s;
+    margin-bottom: 8px;
+  }
+  .log-search-input:focus { outline: none; border-color: #0d9488; background: white; }
+  .log-search-input::placeholder { color: #d4cfc8; }
+
+  .log-search-results {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .log-search-result {
+    padding: 8px;
+    border-bottom: 1px solid #f5f2ed;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .log-search-result:hover { background: #faf7f2; }
+  .log-search-result-name {
+    font-size: 11px;
+    font-weight: 600;
+    color: #2d2a26;
+    margin-bottom: 2px;
+  }
+  .log-search-result-info {
+    font-size: 9px;
+    color: #a8a29e;
+    font-family: 'Fraunces', serif;
+  }
+  .log-search-loading {
+    padding: 12px;
+    text-align: center;
+    font-size: 11px;
+    color: #a8a29e;
+  }
+
+  .log-custom-input-wrap { text-align: center; }
+  .log-custom-label {
+    display: block;
+    font-size: 9px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #a8a29e;
+    margin-bottom: 3px;
+  }
+  .log-custom-input {
+    width: 100%;
+    padding: 6px 4px;
+    border: 1.5px solid #eee8e0;
+    border-radius: 6px;
+    font-size: 13px;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: #2d2a26;
+    text-align: center;
+    background: #faf7f2;
+  }
+  .log-custom-input:focus { outline: none; border-color: #0d9488; background: white; }
+  .log-custom-input::placeholder { color: #d4cfc8; }
+  .log-custom-add-btn, .log-custom-save-btn {
+    padding: 7px 12px;
+    border-radius: 16px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .log-custom-add-btn {
+    border: 1.5px solid #d4cfc8;
+    background: white;
+    color: #6b6560;
+  }
+  .log-custom-add-btn:hover { border-color: #0d9488; color: #0d9488; }
+  .log-custom-save-btn {
+    border: none;
+    background: #0d9488;
+    color: white;
+  }
+  .log-custom-save-btn:hover { background: #0f766e; }
+
+  .log-sidebar { }
+  .log-totals-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #eee8e0;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .log-totals-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    margin-bottom: 10px;
+  }
+  .log-total-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+  }
+  .log-total-label { font-size: 13px; color: #6b6560; }
+  .log-total-val {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d2a26;
+  }
+  .log-total-target { font-size: 11px; color: #a8a29e; margin-left: 4px; }
+  .log-total-row.ok .log-total-val { color: #065f46; }
+  .log-total-row.over .log-total-val { color: #dc2626; }
+
+  .log-bar-track {
+    height: 6px;
+    background: #eee8e0;
+    border-radius: 3px;
+    margin-top: 3px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+  .log-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: #0d9488;
+    transition: width 0.3s;
+  }
+  .log-bar-fill.over { background: #dc2626; }
+
+  .log-water-card {
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #eee8e0;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .log-water-title {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    margin-bottom: 10px;
+  }
+  .log-water-display {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .log-water-oz {
+    font-family: 'Fraunces', serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: #2d2a26;
+  }
+  .log-water-oz span { font-size: 12px; color: #a8a29e; font-family: 'DM Sans', sans-serif; }
+  .log-water-reset {
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid #d4cfc8;
+    background: white;
+    font-size: 9px;
+    color: #8a8580;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .log-water-reset:hover { border-color: #0d9488; color: #0d9488; }
+
+  .log-bar-track { margin-bottom: 10px; }
+
+  .log-water-quick-add {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .log-water-btn {
+    flex: 1;
+    min-width: 60px;
+    padding: 6px;
+    border-radius: 6px;
+    border: 1.5px solid #eee8e0;
+    background: #faf7f2;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b6560;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .log-water-btn:hover { border-color: #0d9488; color: #0d9488; background: #f0ebe6; }
+
+  .log-water-custom {
+    display: flex;
+    gap: 6px;
+  }
+  .log-water-custom-input {
+    flex: 1;
+    padding: 6px;
+    border: 1.5px solid #eee8e0;
+    border-radius: 6px;
+    font-size: 11px;
+    font-family: 'Fraunces', serif;
+    color: #2d2a26;
+    text-align: center;
+    background: #faf7f2;
+    transition: border-color 0.15s;
+  }
+  .log-water-custom-input:focus { outline: none; border-color: #0d9488; background: white; }
+  .log-water-custom-btn {
+    padding: 6px 10px;
+    border-radius: 6px;
+    border: 1.5px solid #eee8e0;
+    background: #faf7f2;
+    font-size: 10px;
+    font-weight: 600;
+    color: #6b6560;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .log-water-custom-btn:hover { border-color: #0d9488; color: #0d9488; }
+
+  .log-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .log-action-btn {
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: 1.5px solid #d4cfc8;
+    background: white;
+    color: #6b6560;
+    transition: all 0.15s;
+  }
+  .log-action-btn:hover { border-color: #0d9488; color: #0d9488; }
+
+  .footer {
+    text-align: center;
+    font-size: 13px;
+    color: #b8b3ad;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid #eee8e0;
+  }
+
+  @media (max-width: 700px) {
+    body { padding: 28px 18px; }
+    .meal-card { grid-template-columns: 1fr; }
+    .meal-macros { text-align: left; padding-top: 8px; display: flex; gap: 12px; align-items: baseline; }
+    .prep-grid { grid-template-columns: 1fr; }
+    .grocery-grid { grid-template-columns: 1fr; }
+    .grocery-categories { grid-template-columns: 1fr; }
+    .day-total { flex-direction: column; align-items: flex-start; }
+    .macro-targets { flex-direction: column; gap: 8px; }
+    .day-card-header { flex-wrap: wrap; }
+    .cal-grid { overflow-x: auto; min-width: 600px; }
+    .cal-phase-select { font-size: 9px; padding: 4px 1px; }
+    .cal-check { width: 22px; height: 22px; }
+    .day-picker-options { flex-direction: column; }
+    .day-picker-opt { min-width: unset; }
+    .grocery-header { flex-direction: column; align-items: flex-start; }
+    .grocery-actions { width: 100%; }
+    .grocery-action-btn { flex: 1; justify-content: center; font-size: 11px; }
+    .planner-split { grid-template-columns: 1fr; }
+    .planner-left, .planner-right { max-height: unset; border-right: none; }
+    .planner-left { border-bottom: 1px solid #eee8e0; }
+    .log-split { grid-template-columns: 1fr; }
+    .log-sidebar { position: static; }
+    .log-add-food-panel { width: 100%; left: 0; }
+  }
+</style>
+</head>
+<body>
+
+<h1>cycle synced meal plan</h1>
+<p class="subtitle">anti-inflammatory · weight loss · 1-2x/week activity · meal prep sundays</p>
+
+<div class="macro-targets">
+  <div class="macro-pill"><span>1,806</span> cal</div>
+  <div class="macro-pill"><span>135g</span> protein</div>
+  <div class="macro-pill"><span>181g</span> carbs</div>
+  <div class="macro-pill"><span>60g</span> fat</div>
+  <div class="macro-pill"><span>26g</span> fiber</div>
+</div>
+
+<div class="tab-nav">
+  <button class="tab active-planner" onclick="showPhase('planner', this)">plan my week</button>
+  <button class="tab" onclick="showPhase('menstrual', this)">menstrual</button>
+  <button class="tab" onclick="showPhase('follicular', this)">follicular</button>
+  <button class="tab" onclick="showPhase('ovulatory', this)">ovulatory</button>
+  <button class="tab" onclick="showPhase('luteal', this)">luteal</button>
+  <button class="tab" onclick="showPhase('prep', this)">sunday prep</button>
+  <button class="tab" onclick="showPhase('log', this)">daily log</button>
+</div>
+
+<!-- PLANNER -->
+<div id="phase-planner" class="phase-content planner-section active">
+  <div class="phase-header">
+    <div class="phase-icon" style="background: #ede9fe;"><i class="ph ph-calendar" style="color: #5b21b6;"></i></div>
+    <div class="phase-title" style="color: #5b21b6;">plan my week</div>
+  </div>
+  <p class="phase-desc">set your phase for each day, check off which meals you're eating at home, then pick your recipes. since you're bulk prepping — pick one recipe per meal type and eat it all week.</p>
+
+  <div class="planner-split">
+    <div class="planner-left">
+      <div class="cal-grid" id="cal-grid">
+        <!-- Header row -->
+        <div class="cal-header" style="border-right: 1px solid #eee8e0;"></div>
+        <div class="cal-header">mon</div>
+        <div class="cal-header">tue</div>
+        <div class="cal-header">wed</div>
+        <div class="cal-header">thu</div>
+        <div class="cal-header">fri</div>
+        <div class="cal-header">sat</div>
+        <div class="cal-header">sun</div>
+        <!-- Phase row -->
+        <div class="cal-row-label" style="border-right: 1px solid #eee8e0;">phase</div>
+        <div class="cal-cell" id="phase-mon"></div>
+        <div class="cal-cell" id="phase-tue"></div>
+        <div class="cal-cell" id="phase-wed"></div>
+        <div class="cal-cell" id="phase-thu"></div>
+        <div class="cal-cell" id="phase-fri"></div>
+        <div class="cal-cell" id="phase-sat"></div>
+        <div class="cal-cell" id="phase-sun"></div>
+        <!-- Check all row -->
+        <div class="cal-row-label" style="border-right: 1px solid #eee8e0; font-size: 10px; color: #a8a29e;">all meals</div>
+        <div class="cal-cell" id="all-mon"></div>
+        <div class="cal-cell" id="all-tue"></div>
+        <div class="cal-cell" id="all-wed"></div>
+        <div class="cal-cell" id="all-thu"></div>
+        <div class="cal-cell" id="all-fri"></div>
+        <div class="cal-cell" id="all-sat"></div>
+        <div class="cal-cell" id="all-sun"></div>
+        <!-- Breakfast row -->
+        <div class="cal-row-label" style="border-right: 1px solid #eee8e0;">breakfast</div>
+        <div class="cal-cell" id="bk-mon"></div>
+        <div class="cal-cell" id="bk-tue"></div>
+        <div class="cal-cell" id="bk-wed"></div>
+        <div class="cal-cell" id="bk-thu"></div>
+        <div class="cal-cell" id="bk-fri"></div>
+        <div class="cal-cell" id="bk-sat"></div>
+        <div class="cal-cell" id="bk-sun"></div>
+        <!-- Snack 1 row -->
+        <div class="cal-row-label" style="border-right: 1px solid #eee8e0;">snack 1</div>
+        <div class="cal-cell" id="s1-mon"></div>
+        <div class="cal-cell" id="s1-tue"></div>
+        <div class="cal-cell" id="s1-wed"></div>
+        <div class="cal-cell" id="s1-thu"></div>
+        <div class="cal-cell" id="s1-fri"></div>
+        <div class="cal-cell" id="s1-sat"></div>
+        <div class="cal-cell" id="s1-sun"></div>
+        <!-- Lunch row -->
+        <div class="cal-row-label" style="border-right: 1px solid #eee8e0;">lunch</div>
+        <div class="cal-cell" id="lu-mon"></div>
+        <div class="cal-cell" id="lu-tue"></div>
+        <div class="cal-cell" id="lu-wed"></div>
+        <div class="cal-cell" id="lu-thu"></div>
+        <div class="cal-cell" id="lu-fri"></div>
+        <div class="cal-cell" id="lu-sat"></div>
+        <div class="cal-cell" id="lu-sun"></div>
+        <!-- Snack 2 row -->
+        <div class="cal-row-label" style="border-right: 1px solid #eee8e0;">snack 2</div>
+        <div class="cal-cell" id="s2-mon"></div>
+        <div class="cal-cell" id="s2-tue"></div>
+        <div class="cal-cell" id="s2-wed"></div>
+        <div class="cal-cell" id="s2-thu"></div>
+        <div class="cal-cell" id="s2-fri"></div>
+        <div class="cal-cell" id="s2-sat"></div>
+        <div class="cal-cell" id="s2-sun"></div>
+        <!-- Dinner row -->
+        <div class="cal-row-label" style="border-right: 1px solid #eee8e0;">dinner</div>
+        <div class="cal-cell" id="dn-mon"></div>
+        <div class="cal-cell" id="dn-tue"></div>
+        <div class="cal-cell" id="dn-wed"></div>
+        <div class="cal-cell" id="dn-thu"></div>
+        <div class="cal-cell" id="dn-fri"></div>
+        <div class="cal-cell" id="dn-sat"></div>
+        <div class="cal-cell" id="dn-sun"></div>
+      </div>
+
+      <button class="generate-btn" onclick="generatePlan()">build my prep list</button>
+      <div class="validation-error" id="validation-error">set at least one phase and check off meals first</div>
+    </div>
+
+    <div class="planner-right" id="planner-right">
+      <div class="planner-right-empty" id="planner-empty">
+        set your phases, check meals, and pick your days<br>
+        <span style="font-size:12px;margin-top:6px;display:block;">your grocery list + prep info will appear here</span>
+      </div>
+      <div class="day-pickers" id="day-pickers">
+        <div class="day-pickers-title">pick day 1 or day 2</div>
+        <div class="day-pickers-subtitle">choose one template per phase — each day is macro-balanced as a whole</div>
+        <div id="pickers-container"></div>
+        <div class="macro-tracker" id="macro-tracker">
+          <div class="macro-tracker-label">daily avg</div>
+          <div class="macro-tracker-pill" id="mt-cal"><span>—</span> cal</div>
+          <div class="macro-tracker-pill" id="mt-p"><span>—</span> P</div>
+          <div class="macro-tracker-pill" id="mt-c"><span>—</span> C</div>
+          <div class="macro-tracker-pill" id="mt-f"><span>—</span> F</div>
+        </div>
+        <button class="generate-btn" onclick="buildResults()" style="margin-top: 16px;">generate grocery list</button>
+      </div>
+      <div id="planner-results" style="display:none;">
+        <div class="results-section" id="results-section-inner">
+          <div class="results-title">your prep list</div>
+          <div id="results-container"></div>
+        </div>
+
+        <div class="grocery-header" style="margin-top:24px;">
+          <div style="font-family:'Fraunces',serif;font-size:16px;color:#2d2a26;">grocery list</div>
+          <div class="grocery-actions">
+            <button class="grocery-action-btn" id="copy-grocery-btn" onclick="copyGroceryList()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+              copy list
+            </button>
+            <button class="grocery-action-btn" id="notes-grocery-btn" onclick="sendToNotes()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              send to apple notes
+            </button>
+          </div>
+        </div>
+        <div id="grocery-list"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MENSTRUAL -->
+<div id="phase-menstrual" class="phase-content menstrual">
+  <div class="phase-header">
+    <div class="phase-icon"><i class="ph ph-drop"></i></div>
+    <div class="phase-title">menstrual phase</div>
+  </div>
+  <p class="phase-desc">warm, iron-rich, anti-inflammatory. your body is losing iron and prostaglandins drive inflammation — lean into omega-3s, ginger, turmeric, magnesium. comfort food that actually works for you.</p>
+
+  <div class="day-toggle">
+    <button class="day-btn active" onclick="showDay('menstrual', 1, this)">day 1</button>
+    <button class="day-btn" onclick="showDay('menstrual', 2, this)">day 2</button>
+  </div>
+
+  <div id="menstrual-day-1" class="day-plan active">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">ginger turmeric congee w/ chicken + egg</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1/3 cup dry white rice, cooked into congee w/ 2 cups chicken broth<br>
+          <span class="arrow">→</span> 4oz shredded chicken breast<br>
+          <span class="arrow">→</span> 1 soft-boiled egg<br>
+          <span class="arrow">→</span> fresh ginger, turmeric, green onion
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">400</div>
+        <div class="meal-macro-row"><strong>39g</strong> P</div>
+        <div class="meal-macro-row"><strong>41g</strong> C</div>
+        <div class="meal-macro-row"><strong>9g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">chia seed pudding</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 tbsp chia seeds + 1/2 cup unsweetened almond milk<br>
+          <span class="arrow">→</span> 1/2 tbsp almond butter<br>
+          <span class="arrow">→</span> 1/4 cup blueberries<br>
+          <span class="arrow">→</span> make night before — grab and go
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">205</div>
+        <div class="meal-macro-row"><strong>7g</strong> P</div>
+        <div class="meal-macro-row"><strong>16g</strong> C</div>
+        <div class="meal-macro-row"><strong>14g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">salmon w/ roasted butternut squash + arugula</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz salmon fillet<br>
+          <span class="arrow">→</span> 1 cup roasted butternut squash<br>
+          <span class="arrow">→</span> 2 cups arugula<br>
+          <span class="arrow">→</span> 1/2 cup cooked white rice<br>
+          <span class="arrow">→</span> 1 tbsp lemon-turmeric dressing
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">522</div>
+        <div class="meal-macro-row"><strong>37g</strong> P</div>
+        <div class="meal-macro-row"><strong>47g</strong> C</div>
+        <div class="meal-macro-row"><strong>21g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">cottage cheese + dates</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1/2 cup low-fat cottage cheese (good culture)<br>
+          <span class="arrow">→</span> 1 medjool date, chopped
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">146</div>
+        <div class="meal-macro-row"><strong>14g</strong> P</div>
+        <div class="meal-macro-row"><strong>22g</strong> C</div>
+        <div class="meal-macro-row"><strong>1g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">coconut chicken curry over rice</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz chicken breast, cubed<br>
+          <span class="arrow">→</span> 1/3 cup light coconut milk<br>
+          <span class="arrow">→</span> 1.5 cups roasted veg (shallots blended in ok)<br>
+          <span class="arrow">→</span> 3/4 cup cooked white rice<br>
+          <span class="arrow">→</span> ginger, turmeric, garlic
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">495</div>
+        <div class="meal-macro-row"><strong>37g</strong> P</div>
+        <div class="meal-macro-row"><strong>61g</strong> C</div>
+        <div class="meal-macro-row"><strong>11g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,768</strong> cal</div>
+        <div class="dt-item"><strong>133g</strong> P</div>
+        <div class="dt-item"><strong>187g</strong> C</div>
+        <div class="dt-item"><strong>56g</strong> F</div>
+        <div class="dt-item"><strong>21g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="menstrual-day-2" class="day-plan">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">turkish eggs w/ yogurt + sourdough</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 eggs over 1/2 cup greek yogurt (2%)<br>
+          <span class="arrow">→</span> 1/2 tsp chili oil<br>
+          <span class="arrow">→</span> 1 slice sourdough<br>
+          <span class="arrow">→</span> 1oz feta, crumbled<br>
+          <span class="arrow">→</span> 1 cup arugula on the side
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">435</div>
+        <div class="meal-macro-row"><strong>31g</strong> P</div>
+        <div class="meal-macro-row"><strong>29g</strong> C</div>
+        <div class="meal-macro-row"><strong>21g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">turkey sticks + apple</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2oz turkey sticks<br>
+          <span class="arrow">→</span> 1 medium apple
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">165</div>
+        <div class="meal-macro-row"><strong>11g</strong> P</div>
+        <div class="meal-macro-row"><strong>27g</strong> C</div>
+        <div class="meal-macro-row"><strong>2g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">butternut squash soup + sourdough + chicken</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1.5 cups roasted butternut squash, blended w/ 1 cup broth<br>
+          <span class="arrow">→</span> 1/2 tsp olive oil<br>
+          <span class="arrow">→</span> 1 slice sourdough<br>
+          <span class="arrow">→</span> 4oz shredded chicken on the side<br>
+          <span class="arrow">→</span> onions ok blended in
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">408</div>
+        <div class="meal-macro-row"><strong>35g</strong> P</div>
+        <div class="meal-macro-row"><strong>56g</strong> C</div>
+        <div class="meal-macro-row"><strong>7g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">cottage cheese + blueberries</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 3/4 cup low-fat cottage cheese<br>
+          <span class="arrow">→</span> 1/4 cup blueberries
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">141</div>
+        <div class="meal-macro-row"><strong>20g</strong> P</div>
+        <div class="meal-macro-row"><strong>11g</strong> C</div>
+        <div class="meal-macro-row"><strong>2g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">chimichurri salmon w/ gigante beans + roasted veg</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz salmon fillet<br>
+          <span class="arrow">→</span> 1/2 cup gigante beans<br>
+          <span class="arrow">→</span> 1 cup roasted veg<br>
+          <span class="arrow">→</span> 1 tbsp chimichurri<br>
+          <span class="arrow">→</span> 1/2 cup cooked white rice
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">625</div>
+        <div class="meal-macro-row"><strong>43g</strong> P</div>
+        <div class="meal-macro-row"><strong>60g</strong> C</div>
+        <div class="meal-macro-row"><strong>23g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,774</strong> cal</div>
+        <div class="dt-item"><strong>139g</strong> P</div>
+        <div class="dt-item"><strong>183g</strong> C</div>
+        <div class="dt-item"><strong>55g</strong> F</div>
+        <div class="dt-item"><strong>21g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOLLICULAR -->
+<div id="phase-follicular" class="phase-content follicular">
+  <div class="phase-header">
+    <div class="phase-icon"><i class="ph ph-leaf"></i></div>
+    <div class="phase-title">follicular phase</div>
+  </div>
+  <p class="phase-desc">estrogen is rising, energy is up. lighter, fresh foods, fermented foods, lean protein. your body is primed for variety — this is the phase where raw/crunchy things feel good.</p>
+
+  <div class="day-toggle">
+    <button class="day-btn active" onclick="showDay('follicular', 1, this)">day 1</button>
+    <button class="day-btn" onclick="showDay('follicular', 2, this)">day 2</button>
+  </div>
+
+  <div id="follicular-day-1" class="day-plan active">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">smoked salmon + eggs + brie on sourdough</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 3oz smoked salmon<br>
+          <span class="arrow">→</span> 2 eggs (scrambled or fried)<br>
+          <span class="arrow">→</span> 1oz brie<br>
+          <span class="arrow">→</span> 1 slice sourdough<br>
+          <span class="arrow">→</span> 1 cup arugula + 1/2 cup tomatoes
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">476</div>
+        <div class="meal-macro-row"><strong>39g</strong> P</div>
+        <div class="meal-macro-row"><strong>27g</strong> C</div>
+        <div class="meal-macro-row"><strong>23g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">apple + almond butter</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1 medium apple<br>
+          <span class="arrow">→</span> 1 tbsp almond butter
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">193</div>
+        <div class="meal-macro-row"><strong>4g</strong> P</div>
+        <div class="meal-macro-row"><strong>28g</strong> C</div>
+        <div class="meal-macro-row"><strong>9g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">shrimp rice bowl w/ kimchi + avocado</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz shrimp<br>
+          <span class="arrow">→</span> 1 cup cooked white rice<br>
+          <span class="arrow">→</span> 1/2 cup cucumber, 1/4 avocado<br>
+          <span class="arrow">→</span> 1/4 cup kimchi + seaweed snack<br>
+          <span class="arrow">→</span> 2 tsp spicy mayo
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">503</div>
+        <div class="meal-macro-row"><strong>40g</strong> P</div>
+        <div class="meal-macro-row"><strong>56g</strong> C</div>
+        <div class="meal-macro-row"><strong>14g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">cottage cheese + blueberries</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1/2 cup low-fat cottage cheese<br>
+          <span class="arrow">→</span> 1/4 cup blueberries
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">101</div>
+        <div class="meal-macro-row"><strong>13g</strong> P</div>
+        <div class="meal-macro-row"><strong>9g</strong> C</div>
+        <div class="meal-macro-row"><strong>1g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">chicken pineapple tacos w/ slaw + rice</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz chicken breast, sliced<br>
+          <span class="arrow">→</span> 3 corn tortillas<br>
+          <span class="arrow">→</span> 1/2 cup pineapple chunks<br>
+          <span class="arrow">→</span> 1 cup cabbage slaw (lime + cilantro)<br>
+          <span class="arrow">→</span> 1/4 avocado<br>
+          <span class="arrow">→</span> 1/4 cup rice on the side
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">525</div>
+        <div class="meal-macro-row"><strong>39g</strong> P</div>
+        <div class="meal-macro-row"><strong>64g</strong> C</div>
+        <div class="meal-macro-row"><strong>13g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,798</strong> cal</div>
+        <div class="dt-item"><strong>136g</strong> P</div>
+        <div class="dt-item"><strong>185g</strong> C</div>
+        <div class="dt-item"><strong>61g</strong> F</div>
+        <div class="dt-item"><strong>26g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="follicular-day-2" class="day-plan">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">egg white buckwheat bowl + chicken sausage</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5 egg whites<br>
+          <span class="arrow">→</span> 3/4 cup cooked buckwheat<br>
+          <span class="arrow">→</span> 1/3 cup blueberries<br>
+          <span class="arrow">→</span> 1 tbsp chocolate chips + flaky salt<br>
+          <span class="arrow">→</span> 1/2 tbsp almond butter<br>
+          <span class="arrow">→</span> 1 chicken sausage link (aidells or bilinski's)
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">488</div>
+        <div class="meal-macro-row"><strong>38g</strong> P</div>
+        <div class="meal-macro-row"><strong>46g</strong> C</div>
+        <div class="meal-macro-row"><strong>18g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">cottage cheese + blueberries</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1/2 cup low-fat cottage cheese<br>
+          <span class="arrow">→</span> 1/4 cup blueberries
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">101</div>
+        <div class="meal-macro-row"><strong>13g</strong> P</div>
+        <div class="meal-macro-row"><strong>9g</strong> C</div>
+        <div class="meal-macro-row"><strong>1g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">stuffed peppers x2 — chicken, rice, feta</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 large bell peppers<br>
+          <span class="arrow">→</span> 4oz chicken breast, diced<br>
+          <span class="arrow">→</span> 1/2 cup cooked white rice<br>
+          <span class="arrow">→</span> 1/2 cup diced tomato<br>
+          <span class="arrow">→</span> 1oz feta crumbled on top
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">406</div>
+        <div class="meal-macro-row"><strong>35g</strong> P</div>
+        <div class="meal-macro-row"><strong>43g</strong> C</div>
+        <div class="meal-macro-row"><strong>10g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">date bites — almond butter + chocolate</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 medjool dates, split open<br>
+          <span class="arrow">→</span> 1 tbsp almond butter<br>
+          <span class="arrow">→</span> 1 tbsp chocolate chips + flaky salt
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">301</div>
+        <div class="meal-macro-row"><strong>5g</strong> P</div>
+        <div class="meal-macro-row"><strong>48g</strong> C</div>
+        <div class="meal-macro-row"><strong>13g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">chimichurri steak w/ bean salad + arugula</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz steak (flank or sirloin)<br>
+          <span class="arrow">→</span> 1 cup bean salad (mixed beans, olive oil, lemon)<br>
+          <span class="arrow">→</span> 1 cup arugula<br>
+          <span class="arrow">→</span> 1 tbsp chimichurri
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">495</div>
+        <div class="meal-macro-row"><strong>48g</strong> P</div>
+        <div class="meal-macro-row"><strong>35g</strong> C</div>
+        <div class="meal-macro-row"><strong>17g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,791</strong> cal</div>
+        <div class="dt-item"><strong>140g</strong> P</div>
+        <div class="dt-item"><strong>181g</strong> C</div>
+        <div class="dt-item"><strong>59g</strong> F</div>
+        <div class="dt-item"><strong>27g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- OVULATORY -->
+<div id="phase-ovulatory" class="phase-content ovulatory">
+  <div class="phase-header">
+    <div class="phase-icon"><i class="ph ph-flower"></i></div>
+    <div class="phase-title">ovulatory phase</div>
+  </div>
+  <p class="phase-desc">peak energy, peak hunger. lean heavily into protein and minerals. this phase can handle more food variety — high energy output = high energy input.</p>
+
+  <div class="day-toggle">
+    <button class="day-btn active" onclick="showDay('ovulatory', 1, this)">day 1</button>
+    <button class="day-btn" onclick="showDay('ovulatory', 2, this)">day 2</button>
+  </div>
+
+  <div id="ovulatory-day-1" class="day-plan active">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">feta + gigante beans + eggs + arugula</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 eggs<br>
+          <span class="arrow">→</span> 1oz feta<br>
+          <span class="arrow">→</span> 1/2 cup gigante beans<br>
+          <span class="arrow">→</span> 1/2 cup tomatoes + 1 cup arugula<br>
+          <span class="arrow">→</span> 1 slice sourdough
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">466</div>
+        <div class="meal-macro-row"><strong>28g</strong> P</div>
+        <div class="meal-macro-row"><strong>48g</strong> C</div>
+        <div class="meal-macro-row"><strong>18g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">turkey sticks + apple</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2oz turkey sticks<br>
+          <span class="arrow">→</span> 1 medium apple
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">165</div>
+        <div class="meal-macro-row"><strong>11g</strong> P</div>
+        <div class="meal-macro-row"><strong>27g</strong> C</div>
+        <div class="meal-macro-row"><strong>2g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">salmon rice bowl w/ kimchi + avocado</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 4oz salmon<br>
+          <span class="arrow">→</span> 1 cup cooked white rice<br>
+          <span class="arrow">→</span> 1/2 cup cucumber, 1/4 avocado<br>
+          <span class="arrow">→</span> 1/4 cup kimchi + seaweed snack<br>
+          <span class="arrow">→</span> 2 tsp spicy mayo
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">595</div>
+        <div class="meal-macro-row"><strong>33g</strong> P</div>
+        <div class="meal-macro-row"><strong>55g</strong> C</div>
+        <div class="meal-macro-row"><strong>26g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">cottage cheese</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 3/4 cup low-fat cottage cheese
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">120</div>
+        <div class="meal-macro-row"><strong>20g</strong> P</div>
+        <div class="meal-macro-row"><strong>6g</strong> C</div>
+        <div class="meal-macro-row"><strong>2g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">chicken breast w/ big raw salad + quinoa</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz chicken breast<br>
+          <span class="arrow">→</span> 2 cups arugula + 1/2 cup cucumber + 1/2 cup tomato<br>
+          <span class="arrow">→</span> 1 cup cabbage slaw<br>
+          <span class="arrow">→</span> 2 tbsp lemon-tahini dressing<br>
+          <span class="arrow">→</span> 3/4 cup cooked quinoa
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">488</div>
+        <div class="meal-macro-row"><strong>43g</strong> P</div>
+        <div class="meal-macro-row"><strong>46g</strong> C</div>
+        <div class="meal-macro-row"><strong>15g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,834</strong> cal</div>
+        <div class="dt-item"><strong>134g</strong> P</div>
+        <div class="dt-item"><strong>182g</strong> C</div>
+        <div class="dt-item"><strong>63g</strong> F</div>
+        <div class="dt-item"><strong>26g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="ovulatory-day-2" class="day-plan">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">smoked salmon + eggs + brie on sourdough</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 3oz smoked salmon<br>
+          <span class="arrow">→</span> 2 eggs<br>
+          <span class="arrow">→</span> 1oz brie<br>
+          <span class="arrow">→</span> 1 slice sourdough<br>
+          <span class="arrow">→</span> 1 cup arugula + 1/2 cup tomatoes
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">476</div>
+        <div class="meal-macro-row"><strong>39g</strong> P</div>
+        <div class="meal-macro-row"><strong>27g</strong> C</div>
+        <div class="meal-macro-row"><strong>23g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">chia seed pudding</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 tbsp chia seeds + 1/2 cup almond milk<br>
+          <span class="arrow">→</span> 1/4 cup blueberries<br>
+          <span class="arrow">→</span> make night before
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">156</div>
+        <div class="meal-macro-row"><strong>5g</strong> P</div>
+        <div class="meal-macro-row"><strong>14g</strong> C</div>
+        <div class="meal-macro-row"><strong>9g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">steak + bean salad w/ chimichurri + rice</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 4oz steak<br>
+          <span class="arrow">→</span> 1 cup bean salad<br>
+          <span class="arrow">→</span> 1 cup arugula<br>
+          <span class="arrow">→</span> 1 tbsp chimichurri<br>
+          <span class="arrow">→</span> 1/2 cup cooked white rice
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">550</div>
+        <div class="meal-macro-row"><strong>43g</strong> P</div>
+        <div class="meal-macro-row"><strong>58g</strong> C</div>
+        <div class="meal-macro-row"><strong>15g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">apple + almond butter</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1 medium apple<br>
+          <span class="arrow">→</span> 1/2 tbsp almond butter
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">144</div>
+        <div class="meal-macro-row"><strong>2g</strong> P</div>
+        <div class="meal-macro-row"><strong>27g</strong> C</div>
+        <div class="meal-macro-row"><strong>5g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">stuffed peppers x2 — shrimp, rice, feta</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz shrimp<br>
+          <span class="arrow">→</span> 2 large bell peppers<br>
+          <span class="arrow">→</span> 3/4 cup cooked white rice<br>
+          <span class="arrow">→</span> 1oz feta + 1/2 cup diced tomato<br>
+          <span class="arrow">→</span> 1 tsp olive oil
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">471</div>
+        <div class="meal-macro-row"><strong>43g</strong> P</div>
+        <div class="meal-macro-row"><strong>56g</strong> C</div>
+        <div class="meal-macro-row"><strong>9g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,797</strong> cal</div>
+        <div class="dt-item"><strong>132g</strong> P</div>
+        <div class="dt-item"><strong>182g</strong> C</div>
+        <div class="dt-item"><strong>61g</strong> F</div>
+        <div class="dt-item"><strong>32g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LUTEAL -->
+<div id="phase-luteal" class="phase-content luteal">
+  <div class="phase-header">
+    <div class="phase-icon"><i class="ph ph-moon"></i></div>
+    <div class="phase-title">luteal phase</div>
+  </div>
+  <p class="phase-desc">energy dips, appetite rises. warmer, comfort foods, more carbs and magnesium. this is when self-care matters most — give your body what it's asking for.</p>
+
+  <div class="day-toggle">
+    <button class="day-btn active" onclick="showDay('luteal', 1, this)">day 1</button>
+    <button class="day-btn" onclick="showDay('luteal', 2, this)">day 2</button>
+  </div>
+
+  <div id="luteal-day-1" class="day-plan active">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">ginger turmeric congee w/ chicken + egg</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1/4 cup dry white rice, cooked into congee w/ 2 cups chicken broth<br>
+          <span class="arrow">→</span> 4oz shredded chicken breast<br>
+          <span class="arrow">→</span> 1 soft-boiled egg<br>
+          <span class="arrow">→</span> fresh ginger, turmeric, green onion
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">358</div>
+        <div class="meal-macro-row"><strong>38g</strong> P</div>
+        <div class="meal-macro-row"><strong>31g</strong> C</div>
+        <div class="meal-macro-row"><strong>9g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">date bites — almond butter + chocolate</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 medjool dates, split open<br>
+          <span class="arrow">→</span> 1 tbsp almond butter<br>
+          <span class="arrow">→</span> 1 tbsp chocolate chips + flaky salt<br>
+          <span class="arrow">→</span> magnesium bomb — perfect for luteal cravings
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">301</div>
+        <div class="meal-macro-row"><strong>5g</strong> P</div>
+        <div class="meal-macro-row"><strong>48g</strong> C</div>
+        <div class="meal-macro-row"><strong>13g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">coconut chicken curry over rice</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz chicken breast, cubed<br>
+          <span class="arrow">→</span> 1/3 cup light coconut milk<br>
+          <span class="arrow">→</span> 1.5 cups roasted veg<br>
+          <span class="arrow">→</span> 1/2 cup cooked white rice<br>
+          <span class="arrow">→</span> 1 tsp olive oil + ginger, turmeric, garlic
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">480</div>
+        <div class="meal-macro-row"><strong>36g</strong> P</div>
+        <div class="meal-macro-row"><strong>49g</strong> C</div>
+        <div class="meal-macro-row"><strong>15g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">cottage cheese + blueberries</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1/2 cup low-fat cottage cheese<br>
+          <span class="arrow">→</span> 1/3 cup blueberries
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">108</div>
+        <div class="meal-macro-row"><strong>13g</strong> P</div>
+        <div class="meal-macro-row"><strong>11g</strong> C</div>
+        <div class="meal-macro-row"><strong>1g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">salmon w/ butternut squash + gigante beans</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz salmon fillet<br>
+          <span class="arrow">→</span> 1 cup roasted butternut squash<br>
+          <span class="arrow">→</span> 1/2 cup gigante beans<br>
+          <span class="arrow">→</span> 2 cups arugula<br>
+          <span class="arrow">→</span> 1 tbsp balsamic + 1 tsp olive oil
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">546</div>
+        <div class="meal-macro-row"><strong>42g</strong> P</div>
+        <div class="meal-macro-row"><strong>46g</strong> C</div>
+        <div class="meal-macro-row"><strong>22g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,793</strong> cal</div>
+        <div class="dt-item"><strong>135g</strong> P</div>
+        <div class="dt-item"><strong>185g</strong> C</div>
+        <div class="dt-item"><strong>61g</strong> F</div>
+        <div class="dt-item"><strong>21g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="luteal-day-2" class="day-plan">
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">breakfast</div>
+        <div class="meal-name">turkish eggs w/ yogurt + sourdough</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2 eggs over 3/4 cup greek yogurt (2%)<br>
+          <span class="arrow">→</span> 1/2 tsp chili oil<br>
+          <span class="arrow">→</span> 1 slice sourdough<br>
+          <span class="arrow">→</span> 1 cup arugula on the side
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">397</div>
+        <div class="meal-macro-row"><strong>32g</strong> P</div>
+        <div class="meal-macro-row"><strong>30g</strong> C</div>
+        <div class="meal-macro-row"><strong>16g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">apple + almond butter</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1 medium apple<br>
+          <span class="arrow">→</span> 1 tbsp almond butter
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">193</div>
+        <div class="meal-macro-row"><strong>4g</strong> P</div>
+        <div class="meal-macro-row"><strong>28g</strong> C</div>
+        <div class="meal-macro-row"><strong>9g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">lunch</div>
+        <div class="meal-name">butternut squash soup + sourdough + chicken</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 1.5 cups roasted butternut squash, blended w/ 1 cup broth<br>
+          <span class="arrow">→</span> 1/2 tsp olive oil<br>
+          <span class="arrow">→</span> 1 slice sourdough<br>
+          <span class="arrow">→</span> 4oz shredded chicken on the side
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">408</div>
+        <div class="meal-macro-row"><strong>35g</strong> P</div>
+        <div class="meal-macro-row"><strong>56g</strong> C</div>
+        <div class="meal-macro-row"><strong>7g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">snack</div>
+        <div class="meal-name">turkey sticks + cottage cheese</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 2oz turkey sticks<br>
+          <span class="arrow">→</span> 1/2 cup low-fat cottage cheese
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">150</div>
+        <div class="meal-macro-row"><strong>23g</strong> P</div>
+        <div class="meal-macro-row"><strong>6g</strong> C</div>
+        <div class="meal-macro-row"><strong>3g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="meal-card">
+      <div>
+        <div class="meal-label">dinner</div>
+        <div class="meal-name">steak w/ gigante beans + roasted veg + rice</div>
+        <div class="meal-details">
+          <span class="arrow">→</span> 5oz steak (flank or sirloin)<br>
+          <span class="arrow">→</span> 1/2 cup gigante beans<br>
+          <span class="arrow">→</span> 1 cup roasted veg<br>
+          <span class="arrow">→</span> 2 tbsp chimichurri<br>
+          <span class="arrow">→</span> 1/2 cup cooked white rice
+        </div>
+      </div>
+      <div class="meal-macros">
+        <div class="meal-cal-label">cal</div>
+        <div class="meal-cal">625</div>
+        <div class="meal-macro-row"><strong>46g</strong> P</div>
+        <div class="meal-macro-row"><strong>60g</strong> C</div>
+        <div class="meal-macro-row"><strong>21g</strong> F</div>
+      </div>
+    </div>
+
+    <div class="day-total">
+      <div class="day-total-label">daily total</div>
+      <div class="day-total-macros">
+        <div class="dt-item"><strong>1,773</strong> cal</div>
+        <div class="dt-item"><strong>140g</strong> P</div>
+        <div class="dt-item"><strong>180g</strong> C</div>
+        <div class="dt-item"><strong>56g</strong> F</div>
+        <div class="dt-item"><strong>22g</strong> fib</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SUNDAY PREP -->
+<div id="phase-prep" class="phase-content prep-section">
+  <div class="phase-header">
+    <div class="phase-icon" style="background: #dbeafe;"><i class="ph ph-knife"></i></div>
+    <div class="phase-title">sunday prep</div>
+  </div>
+  <p class="phase-desc" id="prep-tab-desc">plan your week first, then come here — your prep guide, grocery list, and timeline will appear based on what you're actually making.</p>
+
+  <div id="prep-tab-empty" style="margin-top: 24px;">
+    <div class="notes-section">
+      <div class="notes-title">how it works</div>
+      <div class="notes-item">→ go to "plan my week" and set your phases + meals</div>
+      <div class="notes-item">→ pick day 1 or day 2 for each phase and generate your grocery list</div>
+      <div class="notes-item">→ come back here — your prep timeline, meal list, and grocery list will be waiting</div>
+    </div>
+  </div>
+
+  <div id="prep-tab-content" style="display: none;">
+    <div style="margin-top: 20px;">
+      <div class="prep-guide-title" style="font-family:'Fraunces',serif;font-size:18px;color:#2d2a26;margin-bottom:6px;">this week's meals</div>
+      <div id="prep-tab-meals"></div>
+    </div>
+
+    <div style="margin-top: 28px;">
+      <div class="prep-guide-title" style="font-family:'Fraunces',serif;font-size:18px;color:#2d2a26;margin-bottom:6px;">prep timeline</div>
+      <div style="font-size:13px;color:#8a8580;margin-bottom:16px;">most efficient order — oven first, grains going, cold prep last</div>
+      <div class="prep-timeline" id="prep-tab-timeline"></div>
+    </div>
+
+    <div style="margin-top: 28px;">
+      <div class="grocery-header">
+        <div class="prep-guide-title" style="font-family:'Fraunces',serif;font-size:18px;color:#2d2a26;">grocery list</div>
+        <div class="grocery-actions">
+          <button class="grocery-action-btn" onclick="copyGroceryList()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            copy list
+          </button>
+        </div>
+      </div>
+      <div class="grocery-categories" id="prep-tab-grocery"></div>
+    </div>
+
+    <div class="notes-section" style="margin-top: 28px;">
+      <div class="notes-title">reminders</div>
+      <div class="notes-item">→ weigh proteins raw for accuracy, or cooked and add ~25% to get raw weight</div>
+      <div class="notes-item">→ ±5g on any macro is fine — your body averages over the week</div>
+      <div class="notes-item">→ soup and curry freeze beautifully if you want to get ahead</div>
+      <div class="notes-item">→ consistency > perfection — 90% on plan beats 100% for 3 days then nothing</div>
+    </div>
+
+    <div class="prep-claude-card" style="margin-top: 24px;">
+      <div class="prep-claude-card-icon"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+      <div class="prep-claude-text">
+        <div class="prep-claude-title">need a hand?</div>
+        <div class="prep-claude-desc">ask claude to walk you through each step, adjust timing, or send this grocery list to apple notes.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DAILY LOG -->
+<div id="phase-log" class="phase-content log-section">
+  <div class="phase-header">
+    <div class="phase-icon" style="background: #ccfbf1;"><i class="ph ph-notebook" style="color: #0d9488;"></i></div>
+    <div class="phase-title" style="color: #0d9488;">daily log</div>
+  </div>
+  <p class="phase-desc">log your meals, track macros, and stay hydrated. your targets are pinned on the right so you always know where you stand.</p>
+
+  <div class="log-date-nav">
+    <button class="log-date-btn" onclick="changeLogDate(-1)">←</button>
+    <div class="log-date-display" id="log-date-display">today</div>
+    <button class="log-date-btn" onclick="changeLogDate(1)">→</button>
+  </div>
+
+  <div class="log-split">
+    <div class="log-meals">
+      <!-- Breakfast -->
+      <div class="log-meal-card" data-slot="breakfast">
+        <div class="log-meal-header">
+          <div class="log-meal-label">breakfast</div>
+          <div class="log-meal-cals" id="log-cal-breakfast">0 cal</div>
+        </div>
+        <div class="log-items" id="log-items-breakfast"></div>
+        <button class="log-add-food-btn" onclick="openAddFood('breakfast')">+ add food</button>
+      </div>
+
+      <!-- Snack 1 -->
+      <div class="log-meal-card" data-slot="snack1">
+        <div class="log-meal-header">
+          <div class="log-meal-label">snack 1</div>
+          <div class="log-meal-cals" id="log-cal-snack1">0 cal</div>
+        </div>
+        <div class="log-items" id="log-items-snack1"></div>
+        <button class="log-add-food-btn" onclick="openAddFood('snack1')">+ add food</button>
+      </div>
+
+      <!-- Lunch -->
+      <div class="log-meal-card" data-slot="lunch">
+        <div class="log-meal-header">
+          <div class="log-meal-label">lunch</div>
+          <div class="log-meal-cals" id="log-cal-lunch">0 cal</div>
+        </div>
+        <div class="log-items" id="log-items-lunch"></div>
+        <button class="log-add-food-btn" onclick="openAddFood('lunch')">+ add food</button>
+      </div>
+
+      <!-- Snack 2 -->
+      <div class="log-meal-card" data-slot="snack2">
+        <div class="log-meal-header">
+          <div class="log-meal-label">snack 2</div>
+          <div class="log-meal-cals" id="log-cal-snack2">0 cal</div>
+        </div>
+        <div class="log-items" id="log-items-snack2"></div>
+        <button class="log-add-food-btn" onclick="openAddFood('snack2')">+ add food</button>
+      </div>
+
+      <!-- Dinner -->
+      <div class="log-meal-card" data-slot="dinner">
+        <div class="log-meal-header">
+          <div class="log-meal-label">dinner</div>
+          <div class="log-meal-cals" id="log-cal-dinner">0 cal</div>
+        </div>
+        <div class="log-items" id="log-items-dinner"></div>
+        <button class="log-add-food-btn" onclick="openAddFood('dinner')">+ add food</button>
+      </div>
+    </div>
+
+    <div class="log-sidebar">
+      <!-- Daily Totals -->
+      <div class="log-totals-card">
+        <div class="log-totals-title">daily totals</div>
+        <div class="log-total-row" id="log-row-cal">
+          <div class="log-total-label">calories</div>
+          <div><span class="log-total-val" id="log-total-cal">0</span><span class="log-total-target"> / 1,806</span></div>
+        </div>
+        <div class="log-bar-track"><div class="log-bar-fill" id="log-bar-cal" style="width:0%"></div></div>
+
+        <div class="log-total-row" id="log-row-p">
+          <div class="log-total-label">protein</div>
+          <div><span class="log-total-val" id="log-total-p">0g</span><span class="log-total-target"> / 135g</span></div>
+        </div>
+        <div class="log-bar-track"><div class="log-bar-fill" id="log-bar-p" style="width:0%"></div></div>
+
+        <div class="log-total-row" id="log-row-c">
+          <div class="log-total-label">carbs</div>
+          <div><span class="log-total-val" id="log-total-c">0g</span><span class="log-total-target"> / 181g</span></div>
+        </div>
+        <div class="log-bar-track"><div class="log-bar-fill" id="log-bar-c" style="width:0%"></div></div>
+
+        <div class="log-total-row" id="log-row-f">
+          <div class="log-total-label">fat</div>
+          <div><span class="log-total-val" id="log-total-f">0g</span><span class="log-total-target"> / 60g</span></div>
+        </div>
+        <div class="log-bar-track"><div class="log-bar-fill" id="log-bar-f" style="width:0%"></div></div>
+      </div>
+
+      <!-- Water Tracking -->
+      <div class="log-water-card">
+        <div class="log-water-title">water intake</div>
+        <div class="log-water-display">
+          <div class="log-water-oz"><span id="log-water-oz">0</span> / 120 oz</div>
+          <button class="log-water-reset" onclick="resetWater()">reset</button>
+        </div>
+        <div class="log-bar-track"><div class="log-bar-fill" id="log-bar-water" style="width:0%"></div></div>
+        <div class="log-water-quick-add">
+          <button class="log-water-btn" onclick="addWater(8)">+8 oz</button>
+          <button class="log-water-btn" onclick="addWater(16)">+16 oz</button>
+          <button class="log-water-btn" onclick="addWater(24)">+24 oz</button>
+        </div>
+        <div class="log-water-custom">
+          <input class="log-water-custom-input" id="log-water-custom-input" type="number" placeholder="oz" min="0">
+          <button class="log-water-custom-btn" onclick="customWater()">add</button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="log-actions">
+        <button class="log-action-btn" onclick="prefillFromPlan()">auto-fill from plan</button>
+        <button class="log-action-btn" onclick="copyDailyLog()">copy log</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Food Modal -->
+<div class="log-add-food-panel" id="log-add-food-panel">
+  <div class="log-add-food-header">
+    <div class="log-add-food-title" id="log-add-food-slot-label">Add to breakfast</div>
+    <button class="log-add-food-close" onclick="closeAddFood()">×</button>
+  </div>
+
+  <!-- Quick Pick Section -->
+  <div class="log-panel-section">
+    <div class="log-panel-label">Quick picks from plan</div>
+    <div class="log-quick-picks" id="log-quick-picks"></div>
+  </div>
+
+  <!-- My Foods Section -->
+  <div class="log-panel-section" id="log-my-foods-section" style="display:none;">
+    <div class="log-panel-label">my foods</div>
+    <div class="log-quick-picks" id="log-my-foods"></div>
+  </div>
+
+  <!-- USDA Search Section -->
+  <div class="log-panel-section">
+    <div class="log-panel-label">search foods</div>
+    <input class="log-search-input" id="log-search-input" type="text" placeholder="search any food or brand..." oninput="debounceSearch()">
+    <div class="log-search-results" id="log-search-results"></div>
+  </div>
+
+  <!-- Custom Food Section -->
+  <div class="log-panel-section">
+    <div class="log-panel-label">log a custom food</div>
+    <input class="log-search-input" id="custom-food-name" type="text" placeholder="name (e.g. good culture cottage cheese)" style="margin-bottom:6px;">
+    <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
+      <div class="log-custom-input-wrap"><label class="log-custom-label">cal</label><input class="log-custom-input" id="custom-cal" type="number" placeholder="—"></div>
+      <div class="log-custom-input-wrap"><label class="log-custom-label">protein</label><input class="log-custom-input" id="custom-p" type="number" placeholder="—"></div>
+      <div class="log-custom-input-wrap"><label class="log-custom-label">carbs</label><input class="log-custom-input" id="custom-c" type="number" placeholder="—"></div>
+      <div class="log-custom-input-wrap"><label class="log-custom-label">fat</label><input class="log-custom-input" id="custom-f" type="number" placeholder="—"></div>
+    </div>
+    <div style="display:flex; gap:6px; margin-top:8px;">
+      <button class="log-custom-add-btn" onclick="addCustomFood(false)">add to meal</button>
+      <button class="log-custom-save-btn" onclick="addCustomFood(true)">add + save to my foods</button>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  cycle synced meal plan — built for sierra<br>
+  last updated march 2026
+</div>
+
+<script>
+// ===== RECIPE DATA =====
+const recipes = {
+  menstrual: {
+    day1: {
+      meals: [
+        {slot:'breakfast', name:'ginger turmeric congee w/ chicken + egg', details:['1/3c dry rice → congee w/ 2c chicken broth','4oz shredded chicken','1 soft-boiled egg','ginger, turmeric, green onion'], macros:{cal:400,p:39,c:41,f:9}, grocery:{chicken_breast:4,eggs:1,chicken_broth:2,white_rice:0.33,ginger:1}},
+        {slot:'snack1', name:'chia seed pudding', details:['2 tbsp chia seeds + 1/2c almond milk','1/2 tbsp almond butter','1/4c blueberries'], macros:{cal:205,p:7,c:16,f:14}, grocery:{chia_seeds:2,almond_milk:0.5,almond_butter:0.5,blueberries:0.25}},
+        {slot:'lunch', name:'salmon w/ roasted butternut squash + arugula', details:['5oz salmon','1c roasted butternut squash','2c arugula, 1/2c rice','1 tbsp lemon-turmeric dressing'], macros:{cal:522,p:37,c:47,f:21}, grocery:{salmon:5,butternut_squash:1,arugula:2,white_rice:0.5,olive_oil:1}},
+        {slot:'snack2', name:'cottage cheese + dates', details:['1/2c low-fat cottage cheese','1 medjool date, chopped'], macros:{cal:146,p:14,c:22,f:1}, grocery:{cottage_cheese:0.5,dates:1}},
+        {slot:'dinner', name:'coconut chicken curry over rice', details:['5oz chicken breast','1/3c light coconut milk','1.5c roasted veg','3/4c rice','ginger, turmeric, garlic'], macros:{cal:495,p:37,c:61,f:11}, grocery:{chicken_breast:5,coconut_milk:0.33,white_rice:0.75,roasted_veg:1.5,ginger:1}}
+      ], totals:{cal:1768,p:134,c:187,f:56}
+    },
+    day2: {
+      meals: [
+        {slot:'breakfast', name:'turkish eggs w/ yogurt + sourdough', details:['2 eggs over 1/2c greek yogurt (2%)','1/2 tsp chili oil','1 slice sourdough','1oz feta, 1c arugula'], macros:{cal:435,p:31,c:29,f:21}, grocery:{eggs:2,greek_yogurt:0.5,chili_oil:0.5,sourdough:1,feta:1,arugula:1}},
+        {slot:'snack1', name:'turkey sticks + apple', details:['2oz turkey sticks','1 medium apple'], macros:{cal:165,p:11,c:27,f:2}, grocery:{turkey_sticks:2,apples:1}},
+        {slot:'lunch', name:'butternut squash soup + sourdough + chicken', details:['1.5c roasted butternut squash blended w/ 1c broth','1/2 tsp olive oil','1 slice sourdough','4oz shredded chicken'], macros:{cal:408,p:35,c:56,f:7}, grocery:{butternut_squash:1.5,chicken_broth:1,olive_oil:0.5,sourdough:1,chicken_breast:4}},
+        {slot:'snack2', name:'cottage cheese + blueberries', details:['3/4c low-fat cottage cheese','1/4c blueberries'], macros:{cal:141,p:20,c:11,f:2}, grocery:{cottage_cheese:0.75,blueberries:0.25}},
+        {slot:'dinner', name:'chimichurri salmon w/ gigante beans + roasted veg', details:['5oz salmon','1/2c gigante beans','1c roasted veg','1 tbsp chimichurri','1/2c rice'], macros:{cal:625,p:43,c:60,f:23}, grocery:{salmon:5,gigante_beans:0.5,roasted_veg:1,chimichurri:1,white_rice:0.5}}
+      ], totals:{cal:1774,p:140,c:183,f:55}
+    }
+  },
+  follicular: {
+    day1: {
+      meals: [
+        {slot:'breakfast', name:'smoked salmon + eggs + brie on sourdough', details:['3oz smoked salmon','2 eggs','1oz brie','1 slice sourdough','1c arugula + 1/2c tomatoes'], macros:{cal:476,p:39,c:27,f:23}, grocery:{smoked_salmon:3,eggs:2,brie:1,sourdough:1,arugula:1,tomatoes:0.5}},
+        {slot:'snack1', name:'apple + almond butter', details:['1 medium apple','1 tbsp almond butter'], macros:{cal:193,p:4,c:28,f:9}, grocery:{apples:1,almond_butter:1}},
+        {slot:'lunch', name:'shrimp rice bowl w/ kimchi + avocado', details:['5oz shrimp','1c rice','1/2c cucumber, 1/4 avocado','1/4c kimchi + seaweed','2 tsp spicy mayo'], macros:{cal:503,p:40,c:56,f:14}, grocery:{shrimp:5,white_rice:1,cucumber:0.5,avocado:0.25,kimchi:0.25,seaweed:1,spicy_mayo:2}},
+        {slot:'snack2', name:'cottage cheese + blueberries', details:['1/2c low-fat cottage cheese','1/4c blueberries'], macros:{cal:101,p:13,c:9,f:1}, grocery:{cottage_cheese:0.5,blueberries:0.25}},
+        {slot:'dinner', name:'chicken pineapple tacos w/ slaw + rice', details:['5oz chicken breast','3 corn tortillas','1/2c pineapple','1c cabbage slaw','1/4 avocado, 1/4c rice'], macros:{cal:525,p:39,c:64,f:13}, grocery:{chicken_breast:5,tortillas:3,pineapple:0.5,cabbage:1,avocado:0.25,white_rice:0.25}}
+      ], totals:{cal:1798,p:135,c:184,f:60}
+    },
+    day2: {
+      meals: [
+        {slot:'breakfast', name:'egg white buckwheat bowl + chicken sausage', details:['5 egg whites','3/4c cooked buckwheat','1/3c blueberries','1 tbsp choc chips + flaky salt','1/2 tbsp almond butter','1 chicken sausage link'], macros:{cal:488,p:38,c:46,f:18}, grocery:{egg_whites:5,buckwheat:0.75,blueberries:0.33,chocolate_chips:1,almond_butter:0.5,chicken_sausage:1}},
+        {slot:'snack1', name:'cottage cheese + blueberries', details:['1/2c low-fat cottage cheese','1/4c blueberries'], macros:{cal:101,p:13,c:9,f:1}, grocery:{cottage_cheese:0.5,blueberries:0.25}},
+        {slot:'lunch', name:'stuffed peppers x2 — chicken, rice, feta', details:['2 large bell peppers','4oz chicken breast','1/2c rice','1/2c diced tomato','1oz feta'], macros:{cal:406,p:35,c:43,f:10}, grocery:{bell_peppers:2,chicken_breast:4,white_rice:0.5,tomatoes:0.5,feta:1}},
+        {slot:'snack2', name:'date bites — almond butter + chocolate', details:['2 medjool dates','1 tbsp almond butter','1 tbsp choc chips + flaky salt'], macros:{cal:301,p:5,c:48,f:13}, grocery:{dates:2,almond_butter:1,chocolate_chips:1}},
+        {slot:'dinner', name:'chimichurri steak w/ bean salad + arugula', details:['5oz steak (flank/sirloin)','1c bean salad','1c arugula','1 tbsp chimichurri'], macros:{cal:495,p:48,c:35,f:17}, grocery:{steak:5,mixed_beans:1,arugula:1,chimichurri:1}}
+      ], totals:{cal:1791,p:139,c:181,f:59}
+    }
+  },
+  ovulatory: {
+    day1: {
+      meals: [
+        {slot:'breakfast', name:'feta + gigante beans + eggs + arugula', details:['2 eggs','1oz feta','1/2c gigante beans','1/2c tomatoes + 1c arugula','1 slice sourdough'], macros:{cal:466,p:28,c:48,f:18}, grocery:{eggs:2,feta:1,gigante_beans:0.5,tomatoes:0.5,arugula:1,sourdough:1}},
+        {slot:'snack1', name:'turkey sticks + apple', details:['2oz turkey sticks','1 medium apple'], macros:{cal:165,p:11,c:27,f:2}, grocery:{turkey_sticks:2,apples:1}},
+        {slot:'lunch', name:'salmon rice bowl w/ kimchi + avocado', details:['4oz salmon','1c rice','1/2c cucumber, 1/4 avocado','1/4c kimchi + seaweed','2 tsp spicy mayo'], macros:{cal:595,p:33,c:55,f:26}, grocery:{salmon:4,white_rice:1,cucumber:0.5,avocado:0.25,kimchi:0.25,seaweed:1,spicy_mayo:2}},
+        {slot:'snack2', name:'cottage cheese', details:['3/4c low-fat cottage cheese'], macros:{cal:120,p:20,c:6,f:2}, grocery:{cottage_cheese:0.75}},
+        {slot:'dinner', name:'chicken breast w/ big raw salad + quinoa', details:['5oz chicken breast','2c arugula + 1/2c cucumber + 1/2c tomato','1c cabbage slaw','2 tbsp lemon-tahini','3/4c quinoa'], macros:{cal:488,p:43,c:46,f:15}, grocery:{chicken_breast:5,arugula:2,cucumber:0.5,tomatoes:0.5,cabbage:1,tahini:2,quinoa:0.75}}
+      ], totals:{cal:1834,p:135,c:182,f:63}
+    },
+    day2: {
+      meals: [
+        {slot:'breakfast', name:'smoked salmon + eggs + brie on sourdough', details:['3oz smoked salmon','2 eggs','1oz brie','1 slice sourdough','1c arugula + 1/2c tomatoes'], macros:{cal:476,p:39,c:27,f:23}, grocery:{smoked_salmon:3,eggs:2,brie:1,sourdough:1,arugula:1,tomatoes:0.5}},
+        {slot:'snack1', name:'chia seed pudding', details:['2 tbsp chia seeds + 1/2c almond milk','1/4c blueberries'], macros:{cal:156,p:5,c:14,f:9}, grocery:{chia_seeds:2,almond_milk:0.5,blueberries:0.25}},
+        {slot:'lunch', name:'steak + bean salad w/ chimichurri + rice', details:['4oz steak','1c bean salad','1c arugula','1 tbsp chimichurri','1/2c rice'], macros:{cal:550,p:43,c:58,f:15}, grocery:{steak:4,mixed_beans:1,arugula:1,chimichurri:1,white_rice:0.5}},
+        {slot:'snack2', name:'apple + almond butter', details:['1 medium apple','1/2 tbsp almond butter'], macros:{cal:144,p:2,c:27,f:5}, grocery:{apples:1,almond_butter:0.5}},
+        {slot:'dinner', name:'stuffed peppers x2 — shrimp, rice, feta', details:['5oz shrimp','2 large bell peppers','3/4c rice','1oz feta + 1/2c tomato','1 tsp olive oil'], macros:{cal:471,p:43,c:56,f:9}, grocery:{shrimp:5,bell_peppers:2,white_rice:0.75,feta:1,tomatoes:0.5,olive_oil:1}}
+      ], totals:{cal:1797,p:132,c:182,f:61}
+    }
+  },
+  luteal: {
+    day1: {
+      meals: [
+        {slot:'breakfast', name:'ginger turmeric congee w/ chicken + egg', details:['1/4c dry rice → congee w/ 2c chicken broth','4oz shredded chicken','1 soft-boiled egg','ginger, turmeric, green onion'], macros:{cal:358,p:38,c:31,f:9}, grocery:{chicken_breast:4,eggs:1,chicken_broth:2,white_rice:0.25,ginger:1}},
+        {slot:'snack1', name:'date bites — almond butter + chocolate', details:['2 medjool dates','1 tbsp almond butter','1 tbsp choc chips + flaky salt','magnesium bomb for luteal cravings'], macros:{cal:301,p:5,c:48,f:13}, grocery:{dates:2,almond_butter:1,chocolate_chips:1}},
+        {slot:'lunch', name:'coconut chicken curry over rice', details:['5oz chicken breast','1/3c light coconut milk','1.5c roasted veg','1/2c rice','1 tsp olive oil + ginger, turmeric'], macros:{cal:480,p:36,c:49,f:15}, grocery:{chicken_breast:5,coconut_milk:0.33,roasted_veg:1.5,white_rice:0.5,olive_oil:1,ginger:1}},
+        {slot:'snack2', name:'cottage cheese + blueberries', details:['1/2c low-fat cottage cheese','1/3c blueberries'], macros:{cal:108,p:13,c:11,f:1}, grocery:{cottage_cheese:0.5,blueberries:0.33}},
+        {slot:'dinner', name:'salmon w/ butternut squash + gigante beans', details:['5oz salmon','1c roasted butternut squash','1/2c gigante beans','2c arugula','1 tbsp balsamic + 1 tsp olive oil'], macros:{cal:546,p:42,c:46,f:22}, grocery:{salmon:5,butternut_squash:1,gigante_beans:0.5,arugula:2,olive_oil:1,balsamic:1}}
+      ], totals:{cal:1793,p:134,c:185,f:60}
+    },
+    day2: {
+      meals: [
+        {slot:'breakfast', name:'turkish eggs w/ yogurt + sourdough', details:['2 eggs over 3/4c greek yogurt (2%)','1/2 tsp chili oil','1 slice sourdough','1c arugula'], macros:{cal:397,p:32,c:30,f:16}, grocery:{eggs:2,greek_yogurt:0.75,chili_oil:0.5,sourdough:1,arugula:1}},
+        {slot:'snack1', name:'apple + almond butter', details:['1 medium apple','1 tbsp almond butter'], macros:{cal:193,p:4,c:28,f:9}, grocery:{apples:1,almond_butter:1}},
+        {slot:'lunch', name:'butternut squash soup + sourdough + chicken', details:['1.5c roasted butternut squash blended w/ 1c broth','1/2 tsp olive oil','1 slice sourdough','4oz shredded chicken'], macros:{cal:408,p:35,c:56,f:7}, grocery:{butternut_squash:1.5,chicken_broth:1,olive_oil:0.5,sourdough:1,chicken_breast:4}},
+        {slot:'snack2', name:'turkey sticks + cottage cheese', details:['2oz turkey sticks','1/2c low-fat cottage cheese'], macros:{cal:150,p:23,c:6,f:3}, grocery:{turkey_sticks:2,cottage_cheese:0.5}},
+        {slot:'dinner', name:'steak w/ gigante beans + roasted veg + rice', details:['5oz steak','1/2c gigante beans','1c roasted veg','2 tbsp chimichurri','1/2c rice'], macros:{cal:625,p:46,c:60,f:21}, grocery:{steak:5,gigante_beans:0.5,roasted_veg:1,chimichurri:2,white_rice:0.5}}
+      ], totals:{cal:1773,p:140,c:180,f:56}
+    }
+  }
+};
+
+// Grocery item display names and categories
+const groceryMeta = {
+  chicken_breast:{name:'chicken breast',cat:'proteins',unit:'oz'},
+  salmon:{name:'salmon fillets',cat:'proteins',unit:'oz'},
+  smoked_salmon:{name:'smoked salmon',cat:'proteins',unit:'oz'},
+  shrimp:{name:'shrimp',cat:'proteins',unit:'oz'},
+  steak:{name:'steak (flank/sirloin)',cat:'proteins',unit:'oz'},
+  eggs:{name:'eggs',cat:'proteins',unit:''},
+  egg_whites:{name:'egg whites',cat:'proteins',unit:''},
+  turkey_sticks:{name:'turkey sticks',cat:'proteins',unit:'oz'},
+  chicken_sausage:{name:'chicken sausage links',cat:'proteins',unit:''},
+  greek_yogurt:{name:'greek yogurt (2%)',cat:'dairy',unit:' cups'},
+  cottage_cheese:{name:'cottage cheese (low-fat)',cat:'dairy',unit:' cups'},
+  feta:{name:'feta',cat:'dairy',unit:'oz'},
+  brie:{name:'brie',cat:'dairy',unit:'oz'},
+  kimchi:{name:'kimchi',cat:'dairy',unit:' cups'},
+  arugula:{name:'arugula',cat:'produce',unit:' cups'},
+  butternut_squash:{name:'butternut squash',cat:'produce',unit:' cups roasted'},
+  tomatoes:{name:'tomatoes',cat:'produce',unit:' cups'},
+  cucumber:{name:'cucumber',cat:'produce',unit:' cups'},
+  avocado:{name:'avocados',cat:'produce',unit:' (quarters)'},
+  bell_peppers:{name:'bell peppers',cat:'produce',unit:' large'},
+  cabbage:{name:'cabbage',cat:'produce',unit:' cups shredded'},
+  pineapple:{name:'pineapple',cat:'produce',unit:' cups'},
+  apples:{name:'apples',cat:'produce',unit:''},
+  blueberries:{name:'blueberries',cat:'produce',unit:' cups'},
+  dates:{name:'medjool dates',cat:'produce',unit:''},
+  ginger:{name:'fresh ginger',cat:'produce',unit:'x (always have)'},
+  roasted_veg:{name:'roasted veg (misc)',cat:'produce',unit:' cups'},
+  white_rice:{name:'white rice',cat:'pantry',unit:' cups cooked'},
+  quinoa:{name:'quinoa',cat:'pantry',unit:' cups cooked'},
+  buckwheat:{name:'buckwheat groats',cat:'pantry',unit:' cups cooked'},
+  gigante_beans:{name:'gigante beans',cat:'pantry',unit:' cups'},
+  mixed_beans:{name:'mixed beans (salad)',cat:'pantry',unit:' cups'},
+  coconut_milk:{name:'light coconut milk',cat:'pantry',unit:' cups'},
+  chicken_broth:{name:'chicken broth',cat:'pantry',unit:' cups'},
+  chia_seeds:{name:'chia seeds',cat:'pantry',unit:' tbsp'},
+  chocolate_chips:{name:'chocolate chips',cat:'pantry',unit:' tbsp'},
+  tortillas:{name:'corn tortillas',cat:'pantry',unit:''},
+  sourdough:{name:'sourdough bread',cat:'pantry',unit:' slices'},
+  almond_butter:{name:'almond butter',cat:'condiments',unit:' tbsp'},
+  almond_milk:{name:'almond milk (unsw)',cat:'condiments',unit:' cups'},
+  olive_oil:{name:'olive oil',cat:'condiments',unit:' tsp'},
+  chili_oil:{name:'chili oil',cat:'condiments',unit:' tsp'},
+  chimichurri:{name:'chimichurri',cat:'condiments',unit:' tbsp'},
+  spicy_mayo:{name:'spicy mayo',cat:'condiments',unit:' tsp'},
+  tahini:{name:'tahini',cat:'condiments',unit:' tbsp'},
+  balsamic:{name:'balsamic vinegar',cat:'condiments',unit:' tbsp'},
+  seaweed:{name:'seaweed snacks',cat:'condiments',unit:' packs'}
+};
+
+// ===== STATE =====
+let lastBuild = null; // { needs, selections, groceryTotals, selectedMeals }
+
+// ===== NAVIGATION =====
+function showPhase(phase, tab) {
+  document.querySelectorAll('.phase-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('phase-' + phase).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t => t.className = 'tab');
+  const colorMap = {planner:'active-planner',menstrual:'active-menstrual',follicular:'active-follicular',ovulatory:'active-ovulatory',luteal:'active-luteal',prep:'active-prep',log:'active-log'};
+  tab.classList.add(colorMap[phase]);
+  if (phase === 'prep') populatePrepTab();
+}
+function showDay(phase, day, btn) {
+  const phaseEl = document.getElementById('phase-' + phase);
+  phaseEl.querySelectorAll('.day-plan').forEach(el => el.classList.remove('active'));
+  document.getElementById(phase + '-day-' + day).classList.add('active');
+  phaseEl.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ===== RECIPE LINKS =====
+const recipeLinks = {
+  'ginger turmeric congee w/ chicken + egg': 'https://wishbonekitchen.com/ginger-turmeric-chicken-and-rice-congee-for-instant-pot-and-slow-cooker/',
+  'chia seed pudding': 'https://frommybowl.com/blueberry-chia-seed-pudding/',
+  'salmon w/ roasted butternut squash + arugula': 'https://nataliemarblecooks.com/roasted-salmon-and-butternut-squash-with-herb-crumble/',
+  'cottage cheese + dates': null,
+  'cottage cheese + blueberries': null,
+  'cottage cheese': null,
+  'coconut chicken curry over rice': 'https://downshiftology.com/recipes/coconut-curry-chicken/',
+  'turkish eggs w/ yogurt + sourdough': 'https://www.themediterraneandish.com/cilbir-turkish-poached-eggs/',
+  'turkey sticks + apple': null,
+  'turkey sticks + cottage cheese': null,
+  'butternut squash soup + sourdough + chicken': 'https://www.bowlofdelicious.com/ginger-turmeric-butternut-squash-soup/',
+  'chimichurri salmon w/ gigante beans + roasted veg': 'https://www.chiselandfork.com/chimichurri-salmon',
+  'smoked salmon + eggs + brie on sourdough': 'https://www.jamieoliver.com/recipes/eggs/smoked-salmon-and-scrambled-eggs/',
+  'apple + almond butter': null,
+  'shrimp rice bowl w/ kimchi + avocado': 'https://www.butteredsideupblog.com/korean-inspired-shrimp-rice-bowls/',
+  'chicken pineapple tacos w/ slaw + rice': 'https://www.jessicagavin.com/blackened-chicken-tacos-pineapple-salsa/',
+  'egg white buckwheat bowl + chicken sausage': 'https://secondspringfoods.com/savoury-sprouted-buckwheat-breakfast-bowl/',
+  'stuffed peppers x2 — chicken, rice, feta': 'https://www.peelwithzeal.com/ground-chicken-stuffed-peppers/',
+  'date bites — almond butter + chocolate': null,
+  'chimichurri steak w/ bean salad + arugula': 'https://violetcooks.substack.com/p/steak-chimichurri-dense-bean-salad',
+  'feta + gigante beans + eggs + arugula': null,
+  'salmon rice bowl w/ kimchi + avocado': 'https://www.hirokoliston.com/salmon-kimchi-avocado-rice-bowl/',
+  'chicken breast w/ big raw salad + quinoa': 'https://pinchofyum.com/basic-awesome-chicken-quinoa-salad',
+  'steak + bean salad w/ chimichurri + rice': 'https://challengedairy.com/recipes/salads/chimichurri-dense-bean-salad-with-butter-basted-steak/',
+  'stuffed peppers x2 — shrimp, rice, feta': 'https://www.feastingathome.com/mediterranean-stuffed-peppers/',
+  'salmon w/ butternut squash + gigante beans': 'https://eatsimpli.com/blogs/recipes/creamy-butternut-squash-and-gigante-beans',
+  'steak w/ gigante beans + roasted veg + rice': 'https://thegreekfoodie.com/roasted-beans-in-tomato-sauce-gigantes-plaki/'
+};
+
+// ===== CALENDAR GRID INIT =====
+const days = ['mon','tue','wed','thu','fri','sat','sun'];
+const mealSlots = ['bk','s1','lu','s2','dn'];
+const slotMap = {bk:'breakfast',s1:'snack1',lu:'lunch',s2:'snack2',dn:'dinner'};
+
+function initCalendar() {
+  days.forEach(day => {
+    const cell = document.getElementById('phase-' + day);
+    const sel = document.createElement('select');
+    sel.className = 'cal-phase-select';
+    sel.id = 'ps-' + day;
+    sel.innerHTML = '<option value="">—</option><option value="menstrual">M</option><option value="follicular">F</option><option value="ovulatory">O</option><option value="luteal">L</option>';
+    sel.onchange = function() {
+      this.className = 'cal-phase-select' + (this.value ? ' ph-' + this.value : '');
+      updateCheckColors(day);
+    };
+    cell.appendChild(sel);
+  });
+  // Check-all buttons
+  days.forEach(day => {
+    const cell = document.getElementById('all-' + day);
+    const btn = document.createElement('button');
+    btn.className = 'cal-checkall';
+    btn.id = 'allbtn-' + day;
+    btn.textContent = 'all';
+    btn.onclick = function() { toggleAll(day); };
+    cell.appendChild(btn);
+  });
+  // Meal checkboxes
+  mealSlots.forEach(slot => {
+    days.forEach(day => {
+      const cell = document.getElementById(slot + '-' + day);
+      const chk = document.createElement('div');
+      chk.className = 'cal-check';
+      chk.id = 'chk-' + slot + '-' + day;
+      chk.innerHTML = '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
+      chk.onclick = function() { this.classList.toggle('checked'); updateCheckColors(day); };
+      cell.appendChild(chk);
+    });
+  });
+}
+
+function toggleAll(day) {
+  const allChecked = mealSlots.every(slot =>
+    document.getElementById('chk-' + slot + '-' + day).classList.contains('checked')
+  );
+  mealSlots.forEach(slot => {
+    const chk = document.getElementById('chk-' + slot + '-' + day);
+    if (allChecked) chk.classList.remove('checked');
+    else chk.classList.add('checked');
+  });
+  updateCheckColors(day);
+}
+
+function updateCheckColors(day) {
+  const phase = document.getElementById('ps-' + day).value;
+  mealSlots.forEach(slot => {
+    const chk = document.getElementById('chk-' + slot + '-' + day);
+    chk.classList.remove('ph-menstrual','ph-follicular','ph-ovulatory','ph-luteal');
+    if (phase && chk.classList.contains('checked')) chk.classList.add('ph-' + phase);
+  });
+  // Update check-all button state + color
+  const btn = document.getElementById('allbtn-' + day);
+  btn.classList.remove('ph-menstrual','ph-follicular','ph-ovulatory','ph-luteal');
+  if (phase) btn.classList.add('ph-' + phase);
+  const allChecked = mealSlots.every(slot =>
+    document.getElementById('chk-' + slot + '-' + day).classList.contains('checked')
+  );
+  if (allChecked) btn.classList.add('all-checked');
+  else btn.classList.remove('all-checked');
+}
+
+// ===== PLAN GENERATION =====
+let currentPlan = null;
+
+function generatePlan() {
+  const errorEl = document.getElementById('validation-error');
+  // Count how many days each phase appears AND how many meals are checked per phase per slot
+  const needs = {}; // { phase: { days: count, slots: { slot: count } } }
+  let totalChecked = 0;
+
+  days.forEach(day => {
+    const phase = document.getElementById('ps-' + day).value;
+    if (!phase) return;
+    if (!needs[phase]) needs[phase] = { days: 0, slots: {} };
+    let dayHasMeals = false;
+    mealSlots.forEach(slot => {
+      const chk = document.getElementById('chk-' + slot + '-' + day);
+      if (chk.classList.contains('checked')) {
+        const slotName = slotMap[slot];
+        needs[phase].slots[slotName] = (needs[phase].slots[slotName] || 0) + 1;
+        totalChecked++;
+        dayHasMeals = true;
+      }
+    });
+    if (dayHasMeals) needs[phase].days++;
+  });
+
+  if (totalChecked === 0) { errorEl.classList.add('show'); return; }
+  errorEl.classList.remove('show');
+
+  currentPlan = needs;
+  renderDayPickers(needs);
+  document.getElementById('day-pickers').classList.add('active');
+  document.getElementById('planner-empty').style.display = 'none';
+  document.getElementById('planner-results').style.display = 'none';
+}
+
+function renderDayPickers(needs) {
+  const container = document.getElementById('pickers-container');
+  container.innerHTML = '';
+  const phaseOrder = ['menstrual','follicular','ovulatory','luteal'];
+
+  phaseOrder.forEach(phase => {
+    if (!needs[phase]) return;
+    const info = needs[phase];
+    const totalMeals = Object.values(info.slots).reduce((s,v) => s+v, 0);
+
+    const card = document.createElement('div');
+    card.className = 'day-picker-card';
+
+    let html = '<div class="day-picker-phase-label ' + phase + '">' + phase + '</div>';
+    html += '<div class="day-picker-servings">' + totalMeals + ' meal' + (totalMeals > 1 ? 's' : '') + ' across ' + info.days + ' day' + (info.days > 1 ? 's' : '') + '</div>';
+    html += '<div class="day-picker-options">';
+
+    ['day1','day2'].forEach(dayKey => {
+      const dayData = recipes[phase][dayKey];
+      const t = dayData.totals;
+      const dayLabel = dayKey === 'day1' ? 'day 1' : 'day 2';
+      const mealNames = dayData.meals.map(m => {
+        const link = recipeLinks[m.name];
+        if (link) return '<a href="' + link + '" target="_blank" style="color:inherit;text-decoration:underline dotted;text-underline-offset:2px">' + m.name + '</a>';
+        return m.name;
+      });
+
+      html += '<div class="day-picker-opt" data-phase="' + phase + '" data-day="' + dayKey + '" onclick="selectDay(this)">';
+      html += '<div class="day-picker-opt-title">' + dayLabel + '</div>';
+      html += '<div class="day-picker-opt-meals">' + mealNames.join(' · ') + '</div>';
+      html += '<div class="day-picker-opt-macros">' + t.cal + ' cal · ' + t.p + 'g P · ' + t.c + 'g C · ' + t.f + 'g F</div>';
+      html += '</div>';
+    });
+
+    html += '</div>';
+    card.innerHTML = html;
+    container.appendChild(card);
+  });
+
+  // Reset macro tracker
+  updateMacroTracker();
+}
+
+function selectDay(el) {
+  // Deselect other day in same phase card
+  el.parentElement.querySelectorAll('.day-picker-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  updateMacroTracker();
+}
+
+function updateMacroTracker() {
+  const selections = document.querySelectorAll('.day-picker-opt.selected');
+  const tracker = document.getElementById('macro-tracker');
+
+  if (selections.length === 0) {
+    tracker.classList.remove('active');
+    return;
+  }
+
+  let totalCal = 0, totalP = 0, totalC = 0, totalF = 0, totalDays = 0;
+
+  selections.forEach(el => {
+    const phase = el.dataset.phase;
+    const day = el.dataset.day;
+    const t = recipes[phase][day].totals;
+    const phaseDays = currentPlan[phase].days;
+    totalCal += t.cal * phaseDays;
+    totalP += t.p * phaseDays;
+    totalC += t.c * phaseDays;
+    totalF += t.f * phaseDays;
+    totalDays += phaseDays;
+  });
+
+  if (totalDays > 0) {
+    const avgCal = Math.round(totalCal / totalDays);
+    const avgP = Math.round(totalP / totalDays);
+    const avgC = Math.round(totalC / totalDays);
+    const avgF = Math.round(totalF / totalDays);
+
+    const targets = {cal:1806, p:135, c:181, f:60};
+    const setVal = (id, val, target, unit) => {
+      const el = document.getElementById(id);
+      el.innerHTML = '<span>' + val + '</span> ' + unit;
+      el.className = 'macro-tracker-pill';
+      if (Math.abs(val - target) <= 10) el.classList.add('ok');
+      else el.classList.add('warn');
+    };
+    setVal('mt-cal', avgCal, targets.cal, 'cal');
+    setVal('mt-p', avgP + 'g', targets.p, 'P');
+    setVal('mt-c', avgC + 'g', targets.c, 'C');
+    setVal('mt-f', avgF + 'g', targets.f, 'F');
+    tracker.classList.add('active');
+  }
+}
+
+// ===== RESULTS + GROCERY =====
+let lastGroceryText = '';
+
+function buildResults() {
+  // Check all phases have a day selected
+  const needs = currentPlan;
+  const selections = {};
+  document.querySelectorAll('.day-picker-opt.selected').forEach(el => {
+    selections[el.dataset.phase] = el.dataset.day;
+  });
+
+  const missingPhases = Object.keys(needs).filter(p => !selections[p]);
+  if (missingPhases.length > 0) {
+    alert('pick day 1 or day 2 for: ' + missingPhases.join(', '));
+    return;
+  }
+
+  // Build prep list
+  const resultsContainer = document.getElementById('results-container');
+  resultsContainer.innerHTML = '';
+  const groceryTotals = {};
+  const slotLabels = {breakfast:'breakfast',snack1:'snack 1',lunch:'lunch',snack2:'snack 2',dinner:'dinner'};
+  const slotOrder = ['breakfast','snack1','lunch','snack2','dinner'];
+
+  Object.keys(needs).forEach(phase => {
+    const day = selections[phase];
+    const dayData = recipes[phase][day];
+    const slots = needs[phase].slots;
+
+    slotOrder.forEach(slot => {
+      if (!slots[slot]) return;
+      const count = slots[slot];
+      const meal = dayData.meals.find(m => m.slot === slot);
+      if (!meal) return;
+
+      const card = document.createElement('div');
+      card.className = 'result-meal-card';
+      const m = meal.macros;
+      const link = recipeLinks[meal.name];
+      const nameHtml = link
+        ? '<a href="' + link + '" target="_blank" style="color:inherit;text-decoration:underline dotted;text-underline-offset:3px">' + meal.name + '</a>'
+        : meal.name;
+      let detailsHtml = meal.details.map(d => '<span class="arrow">→</span> ' + d).join('<br>');
+      card.innerHTML = '<div class="result-meal-header"><div class="result-meal-type">' + slotLabels[slot] + ' · ' + phase + '</div><div class="result-meal-servings">prep ' + count + 'x</div></div>' +
+        '<div class="result-meal-name">' + nameHtml + '</div>' +
+        '<div class="result-meal-details">' + detailsHtml + '</div>' +
+        '<div class="result-meal-macros-row">per serving: <strong>' + m.cal + '</strong> cal · <strong>' + m.p + 'g</strong> P · <strong>' + m.c + 'g</strong> C · <strong>' + m.f + 'g</strong> F</div>';
+      resultsContainer.appendChild(card);
+
+      // Aggregate grocery
+      if (meal.grocery) {
+        Object.keys(meal.grocery).forEach(item => {
+          groceryTotals[item] = (groceryTotals[item] || 0) + (meal.grocery[item] * count);
+        });
+      }
+    });
+  });
+
+  // Build grocery list with checkboxes
+  const categories = {proteins:[],dairy:[],produce:[],pantry:[],condiments:[]};
+  Object.keys(groceryTotals).forEach(item => {
+    const meta = groceryMeta[item];
+    if (!meta) return;
+    const qty = groceryTotals[item];
+    const rounded = Math.round(qty * 10) / 10;
+    let display = meta.name;
+    if (meta.unit === 'x (always have)') display += ' — always have on hand';
+    else display += ' — ' + rounded + meta.unit;
+    if (categories[meta.cat]) categories[meta.cat].push(display);
+  });
+
+  const listContainer = document.getElementById('grocery-list');
+  listContainer.innerHTML = '';
+  const catNames = {proteins:'proteins',dairy:'dairy + fridge',produce:'produce',pantry:'pantry + grains',condiments:'condiments'};
+  let plainText = 'GROCERY LIST\n============\n';
+
+  Object.keys(catNames).forEach(cat => {
+    if (categories[cat].length === 0) return;
+    plainText += '\n' + catNames[cat].toUpperCase() + '\n';
+    const card = document.createElement('div');
+    card.className = 'grocery-category-card';
+    let html = '<div class="grocery-category-title">' + catNames[cat] + '</div>';
+    categories[cat].forEach(item => {
+      plainText += '  - ' + item + '\n';
+      html += '<div class="grocery-list-item" onclick="this.classList.toggle(\'crossed\')">' +
+        '<div class="grocery-item-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" fill="none" stroke="white" stroke-width="3"/></svg></div>' +
+        '<div class="grocery-item-text">' + item + '</div></div>';
+    });
+    card.innerHTML = html;
+    listContainer.appendChild(card);
+  });
+
+  lastGroceryText = plainText;
+
+  // Save state for sunday prep tab
+  const allSelectedMeals = [];
+  Object.keys(needs).forEach(phase => {
+    const day = selections[phase];
+    const dayData = recipes[phase][day];
+    slotOrder.forEach(slot => {
+      if (!needs[phase].slots[slot]) return;
+      const meal = dayData.meals.find(m => m.slot === slot);
+      if (meal) allSelectedMeals.push({phase, slot, count: needs[phase].slots[slot], meal});
+    });
+  });
+  lastBuild = {needs, selections, groceryTotals, categories, allSelectedMeals};
+
+  // Show results in right panel, hide day pickers
+  document.getElementById('planner-empty').style.display = 'none';
+  document.getElementById('day-pickers').classList.remove('active');
+  document.getElementById('planner-results').style.display = 'block';
+}
+
+// ===== PREP DAY GUIDE =====
+const prepData = {
+  // key = meal name, value = {type, order, time, title, steps}
+  // type: oven | stovetop | cold | assembly
+  // order: lower = do first
+  'coconut chicken curry over rice': {type:'stovetop', order:10, time:'30 min', title:'cook coconut chicken curry', steps:'cube chicken → sear in pot → add coconut milk, ginger, turmeric, garlic, blended shallots → simmer 15 min → add roasted veg'},
+  'salmon w/ roasted butternut squash + arugula': {type:'oven', order:2, time:'25 min', title:'bake salmon fillets', steps:'season salmon w/ salt, pepper, turmeric → bake 400°F 12-15 min → rest and portion'},
+  'chimichurri salmon w/ gigante beans + roasted veg': {type:'oven', order:2, time:'25 min', title:'bake salmon fillets', steps:'season salmon → bake 400°F 12-15 min → portion w/ chimichurri on top'},
+  'salmon w/ butternut squash + gigante beans': {type:'oven', order:2, time:'25 min', title:'bake salmon fillets', steps:'season salmon → bake 400°F 12-15 min → portion over squash + beans'},
+  'chicken breast w/ big raw salad + quinoa': {type:'oven', order:3, time:'25 min', title:'bake chicken breasts', steps:'season w/ salt, pepper, garlic powder → bake 400°F 20-22 min → slice and portion'},
+  'chicken pineapple tacos w/ slaw + rice': {type:'oven', order:3, time:'25 min', title:'bake chicken for tacos', steps:'season chicken w/ cumin, chili, lime → bake 400°F 20 min → shred'},
+  'chimichurri steak w/ bean salad + arugula': {type:'stovetop', order:12, time:'15 min', title:'cook steak', steps:'bring to room temp → salt heavily → sear 4 min/side medium-high → rest 10 min → slice thin against grain'},
+  'steak + bean salad w/ chimichurri + rice': {type:'stovetop', order:12, time:'15 min', title:'cook steak', steps:'same as above — sear, rest, slice'},
+  'steak w/ gigante beans + roasted veg + rice': {type:'stovetop', order:12, time:'15 min', title:'cook steak', steps:'sear 4 min/side → rest 10 min → slice and portion'},
+  'shrimp rice bowl w/ kimchi + avocado': {type:'stovetop', order:14, time:'8 min', title:'sauté shrimp', steps:'pat dry → season w/ garlic, ginger → sear 2-3 min/side high heat → portion'},
+  'salmon rice bowl w/ kimchi + avocado': {type:'oven', order:2, time:'15 min', title:'bake salmon for rice bowls', steps:'season → bake 400°F 12 min → flake into portions'},
+  'stuffed peppers x2 — chicken, rice, feta': {type:'oven', order:4, time:'35 min', title:'stuff + bake peppers', steps:'halve peppers → mix chicken, rice, tomato, feta → stuff → bake 375°F 30 min'},
+  'stuffed peppers x2 — shrimp, rice, feta': {type:'oven', order:4, time:'35 min', title:'stuff + bake peppers', steps:'halve peppers → mix shrimp, rice, feta, tomato → stuff → bake 375°F 30 min'},
+  'ginger turmeric congee w/ chicken + egg': {type:'stovetop', order:8, time:'35 min', title:'simmer congee', steps:'boil rice in broth → reduce heat, stir occasionally 25 min → add shredded chicken → soft boil eggs separately'},
+  'butternut squash soup + sourdough + chicken': {type:'stovetop', order:9, time:'15 min', title:'blend butternut squash soup', steps:'roasted squash + broth in blender → blitz smooth → warm on stove → portion'},
+  'turkish eggs w/ yogurt + sourdough': {type:'cold', order:20, time:'5 min/serving', title:'prep turkish eggs kit', steps:'portion yogurt into containers → portion feta + arugula → eggs cook fresh day-of (2 min)'},
+  'smoked salmon + eggs + brie on sourdough': {type:'cold', order:21, time:'5 min', title:'prep smoked salmon kits', steps:'portion smoked salmon + brie + arugula into containers → eggs cook fresh day-of'},
+  'feta + gigante beans + eggs + arugula': {type:'cold', order:22, time:'5 min', title:'prep feta bean bowls', steps:'portion beans, feta, tomato, arugula → eggs cook fresh day-of'},
+  'egg white buckwheat bowl + chicken sausage': {type:'cold', order:23, time:'5 min', title:'portion buckwheat bowls', steps:'portion cooked buckwheat + blueberries + choc chips → egg whites + sausage cook fresh'},
+  'chia seed pudding': {type:'cold', order:25, time:'5 min', title:'mix chia puddings', steps:'combine chia seeds + almond milk + almond butter in jars → fridge overnight → top w/ berries morning-of'},
+  'date bites — almond butter + chocolate': {type:'assembly', order:30, time:'10 min', title:'make date bites', steps:'halve dates → fill w/ almond butter → press choc chips on top → flaky salt → fridge'},
+  'cottage cheese + dates': {type:'assembly', order:31, time:'2 min', title:'portion cottage cheese + dates', steps:'scoop cottage cheese into containers → chop dates on top'},
+  'cottage cheese + blueberries': {type:'assembly', order:31, time:'2 min', title:'portion cottage cheese + berries', steps:'scoop cottage cheese → top w/ blueberries'},
+  'cottage cheese': {type:'assembly', order:31, time:'2 min', title:'portion cottage cheese', steps:'scoop into containers'},
+  'apple + almond butter': {type:'assembly', order:32, time:'1 min', title:'portion almond butter', steps:'small containers of almond butter — slice apples day-of'},
+  'turkey sticks + apple': {type:'assembly', order:33, time:'1 min', title:'bag turkey sticks', steps:'already prepped — just bag w/ apples day-of'},
+  'turkey sticks + cottage cheese': {type:'assembly', order:33, time:'1 min', title:'bag turkey sticks + portion cheese', steps:'portion cottage cheese → pair w/ turkey sticks'}
+};
+
+// Standalone tasks that fire based on ingredients in the grocery list
+const standaloneSteps = [
+  {trigger: 'butternut_squash', type:'oven', order:1, time:'30 min', title:'roast butternut squash', steps:'peel, cube → toss w/ olive oil, salt → roast 400°F 25-30 min — this goes in first, everything else works around it'},
+  {trigger: 'roasted_veg', type:'oven', order:1, time:'30 min', title:'roast mixed vegetables', steps:'chop veg (whatever you have) → toss w/ olive oil, salt → roast 400°F 25-30 min — can share the oven w/ squash'},
+  {trigger: 'white_rice', type:'stovetop', order:5, time:'20 min', title:'cook rice (big batch)', steps:'rinse rice → 1:1.5 rice to water ratio → bring to boil → cover, simmer 15 min → fluff and cool'},
+  {trigger: 'quinoa', type:'stovetop', order:5, time:'20 min', title:'cook quinoa', steps:'rinse quinoa → 1:2 ratio → boil → simmer 15 min → fluff'},
+  {trigger: 'buckwheat', type:'stovetop', order:5, time:'15 min', title:'cook buckwheat', steps:'toast in dry pan 2 min → add water 1:2 → simmer 12 min → drain'},
+  {trigger: 'chimichurri', type:'cold', order:18, time:'5 min', title:'make chimichurri', steps:'blitz parsley, garlic, olive oil, red wine vinegar, red pepper flakes → jar it'},
+  {trigger: 'mixed_beans', type:'cold', order:19, time:'5 min', title:'make bean salad', steps:'drain + rinse beans → toss w/ olive oil, lemon, herbs, salt → portion'}
+];
+
+function buildPrepGuide(needs, selections) {
+  const timeline = document.getElementById('prep-timeline');
+  timeline.innerHTML = '';
+
+  // Collect all selected meals
+  const selectedMeals = [];
+  const groceryKeys = new Set();
+  const slotOrder = ['breakfast','snack1','lunch','snack2','dinner'];
+
+  Object.keys(needs).forEach(phase => {
+    const day = selections[phase];
+    const dayData = recipes[phase][day];
+    const slots = needs[phase].slots;
+    slotOrder.forEach(slot => {
+      if (!slots[slot]) return;
+      const meal = dayData.meals.find(m => m.slot === slot);
+      if (!meal) return;
+      selectedMeals.push(meal);
+      if (meal.grocery) Object.keys(meal.grocery).forEach(k => groceryKeys.add(k));
+    });
+  });
+
+  // Build steps array
+  const steps = [];
+  const addedTitles = new Set();
+
+  // Add standalone steps based on grocery ingredients
+  standaloneSteps.forEach(ss => {
+    if (groceryKeys.has(ss.trigger) && !addedTitles.has(ss.title)) {
+      steps.push({type:ss.type, order:ss.order, time:ss.time, title:ss.title, steps:ss.steps});
+      addedTitles.add(ss.title);
+    }
+  });
+
+  // Add meal-specific steps
+  selectedMeals.forEach(meal => {
+    const pd = prepData[meal.name];
+    if (pd && !addedTitles.has(pd.title)) {
+      steps.push({type:pd.type, order:pd.order, time:pd.time, title:pd.title, steps:pd.steps});
+      addedTitles.add(pd.title);
+    }
+  });
+
+  // Sort by order
+  steps.sort((a, b) => a.order - b.order);
+
+  // Add a "start" step
+  const startStep = document.createElement('div');
+  startStep.className = 'prep-step active-step';
+  startStep.innerHTML = '<div class="prep-step-dot"></div>' +
+    '<div class="prep-step-time">before you start</div>' +
+    '<div class="prep-step-title">mise en place</div>' +
+    '<div class="prep-step-detail">preheat oven to 400°F · pull proteins from fridge · get out sheet pans, pots, cutting board · put on a podcast</div>';
+  timeline.appendChild(startStep);
+
+  // Running time tracker
+  let runningMin = 0;
+  const typeLabels = {oven:'oven', stovetop:'stovetop', cold:'no-cook prep', assembly:'portion + pack'};
+
+  steps.forEach(step => {
+    const el = document.createElement('div');
+    el.className = 'prep-step ' + step.type;
+    const timeStr = runningMin === 0 ? 'first up' : '~' + runningMin + ' min in';
+    el.innerHTML = '<div class="prep-step-dot"></div>' +
+      '<div class="prep-step-time">' + timeStr + ' · ' + step.time + '</div>' +
+      '<div class="prep-step-title">' + step.title + '</div>' +
+      '<div class="prep-step-detail">' + step.steps + '</div>' +
+      '<div class="prep-step-tag">' + typeLabels[step.type] + '</div>';
+    timeline.appendChild(el);
+    // Estimate time contribution (oven/stovetop items overlap, cold/assembly are sequential)
+    const mins = parseInt(step.time) || 5;
+    if (step.type === 'cold' || step.type === 'assembly') runningMin += mins;
+    else if (runningMin === 0) runningMin += mins; // first hot item sets the clock
+    // else parallel — don't add
+  });
+
+  // Final step
+  const doneStep = document.createElement('div');
+  doneStep.className = 'prep-step active-step';
+  doneStep.innerHTML = '<div class="prep-step-dot"></div>' +
+    '<div class="prep-step-time">~' + (runningMin + 10) + ' min total</div>' +
+    '<div class="prep-step-title">label + fridge</div>' +
+    '<div class="prep-step-detail">label containers w/ meal name + day · stack in fridge by day · you\'re done for the week</div>';
+  timeline.appendChild(doneStep);
+}
+
+function copyGroceryList() {
+  if (!lastGroceryText) return;
+  navigator.clipboard.writeText(lastGroceryText).then(() => {
+    const btn = document.getElementById('copy-grocery-btn');
+    btn.classList.add('copied');
+    btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> copied!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg> copy list';
+    }, 2000);
+  });
+}
+
+function sendToNotes() {
+  const btn = document.getElementById('notes-grocery-btn');
+  btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> sending...';
+  // This triggers a message to the parent — in standalone HTML, we copy + prompt
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(lastGroceryText).then(() => {
+      btn.classList.add('sent');
+      btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> copied — paste into notes!';
+      setTimeout(() => {
+        btn.classList.remove('sent');
+        btn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg> send to apple notes';
+      }, 3000);
+    });
+  }
+}
+
+// ===== POPULATE SUNDAY PREP TAB =====
+function populatePrepTab() {
+  if (!lastBuild) {
+    document.getElementById('prep-tab-empty').style.display = 'block';
+    document.getElementById('prep-tab-content').style.display = 'none';
+    return;
+  }
+
+  document.getElementById('prep-tab-empty').style.display = 'none';
+  document.getElementById('prep-tab-content').style.display = 'block';
+
+  const {needs, selections, groceryTotals, categories, allSelectedMeals} = lastBuild;
+  const slotLabels = {breakfast:'breakfast',snack1:'snack 1',lunch:'lunch',snack2:'snack 2',dinner:'dinner'};
+
+  // 1. Populate meals list
+  const mealsContainer = document.getElementById('prep-tab-meals');
+  mealsContainer.innerHTML = '';
+  allSelectedMeals.forEach(({phase, slot, count, meal}) => {
+    const link = recipeLinks[meal.name];
+    const nameHtml = link
+      ? '<a href="' + link + '" target="_blank" style="color:inherit;text-decoration:underline dotted;text-underline-offset:3px">' + meal.name + '</a>'
+      : meal.name;
+    const card = document.createElement('div');
+    card.className = 'result-meal-card';
+    card.innerHTML = '<div class="result-meal-header"><div class="result-meal-type">' + slotLabels[slot] + ' · ' + phase + '</div><div class="result-meal-servings">prep ' + count + 'x</div></div>' +
+      '<div class="result-meal-name">' + nameHtml + '</div>' +
+      '<div class="result-meal-details">' + meal.details.map(d => '<span class="arrow">→</span> ' + d).join('<br>') + '</div>';
+    mealsContainer.appendChild(card);
+  });
+
+  // 2. Populate prep timeline (reuse buildPrepGuide logic but target the prep tab timeline)
+  const timeline = document.getElementById('prep-tab-timeline');
+  timeline.innerHTML = '';
+
+  const groceryKeys = new Set();
+  allSelectedMeals.forEach(({meal}) => {
+    if (meal.grocery) Object.keys(meal.grocery).forEach(k => groceryKeys.add(k));
+  });
+
+  const steps = [];
+  const addedTitles = new Set();
+
+  standaloneSteps.forEach(ss => {
+    if (groceryKeys.has(ss.trigger) && !addedTitles.has(ss.title)) {
+      steps.push({type:ss.type, order:ss.order, time:ss.time, title:ss.title, steps:ss.steps});
+      addedTitles.add(ss.title);
+    }
+  });
+
+  allSelectedMeals.forEach(({meal}) => {
+    const pd = prepData[meal.name];
+    if (pd && !addedTitles.has(pd.title)) {
+      steps.push({type:pd.type, order:pd.order, time:pd.time, title:pd.title, steps:pd.steps});
+      addedTitles.add(pd.title);
+    }
+  });
+
+  steps.sort((a, b) => a.order - b.order);
+
+  const startStep = document.createElement('div');
+  startStep.className = 'prep-step active-step';
+  startStep.innerHTML = '<div class="prep-step-dot"></div>' +
+    '<div class="prep-step-time">before you start</div>' +
+    '<div class="prep-step-title">mise en place</div>' +
+    '<div class="prep-step-detail">preheat oven to 400°F · pull proteins from fridge · get out sheet pans, pots, cutting board · put on a podcast</div>';
+  timeline.appendChild(startStep);
+
+  let runningMin = 0;
+  const typeLabels = {oven:'oven', stovetop:'stovetop', cold:'no-cook prep', assembly:'portion + pack'};
+
+  steps.forEach(step => {
+    const el = document.createElement('div');
+    el.className = 'prep-step ' + step.type;
+    const timeStr = runningMin === 0 ? 'first up' : '~' + runningMin + ' min in';
+    el.innerHTML = '<div class="prep-step-dot"></div>' +
+      '<div class="prep-step-time">' + timeStr + ' · ' + step.time + '</div>' +
+      '<div class="prep-step-title">' + step.title + '</div>' +
+      '<div class="prep-step-detail">' + step.steps + '</div>' +
+      '<div class="prep-step-tag">' + typeLabels[step.type] + '</div>';
+    timeline.appendChild(el);
+    const mins = parseInt(step.time) || 5;
+    if (step.type === 'cold' || step.type === 'assembly') runningMin += mins;
+    else if (runningMin === 0) runningMin += mins;
+  });
+
+  const doneStep = document.createElement('div');
+  doneStep.className = 'prep-step active-step';
+  doneStep.innerHTML = '<div class="prep-step-dot"></div>' +
+    '<div class="prep-step-time">~' + (runningMin + 10) + ' min total</div>' +
+    '<div class="prep-step-title">label + fridge</div>' +
+    '<div class="prep-step-detail">label containers w/ meal name + day · stack in fridge by day · you\'re done for the week</div>';
+  timeline.appendChild(doneStep);
+
+  // 3. Populate grocery list with checkboxes
+  const listContainer = document.getElementById('prep-tab-grocery');
+  listContainer.innerHTML = '';
+  const catNames = {proteins:'proteins',dairy:'dairy + fridge',produce:'produce',pantry:'pantry + grains',condiments:'condiments'};
+  Object.keys(catNames).forEach(cat => {
+    if (!categories[cat] || categories[cat].length === 0) return;
+    const card = document.createElement('div');
+    card.className = 'grocery-category-card';
+    let html = '<div class="grocery-category-title">' + catNames[cat] + '</div>';
+    categories[cat].forEach(item => {
+      html += '<div class="grocery-list-item" onclick="this.classList.toggle(\'crossed\')">' +
+        '<div class="grocery-item-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12" fill="none" stroke="white" stroke-width="3"/></svg></div>' +
+        '<div class="grocery-item-text">' + item + '</div></div>';
+    });
+    card.innerHTML = html;
+    listContainer.appendChild(card);
+  });
+}
+
+// ===== DAILY LOG =====
+let logDate = new Date();
+const logSlots = ['breakfast','snack1','lunch','snack2','dinner'];
+const macroTargets = {cal:1806, p:135, c:181, f:60};
+const waterTarget = 120; // oz
+let waterOz = 0;
+let loggedFoods = {breakfast:[], snack1:[], lunch:[], snack2:[], dinner:[]};
+let addFoodSlot = null; // which slot the add-food panel is for
+let myFoods = []; // custom saved foods: [{name, macros:{cal,p,c,f}}]
+let searchTimeout = null; // for debouncing USDA search
+
+function openAddFood(slot) {
+  addFoodSlot = slot;
+  const slotLabel = slot === 'snack1' ? 'snack 1' : slot === 'snack2' ? 'snack 2' : slot;
+  document.getElementById('log-add-food-slot-label').textContent = 'Add to ' + slotLabel;
+
+  // Populate quick picks
+  const quickPicks = getQuickPicks(slot);
+  const container = document.getElementById('log-quick-picks');
+  container.innerHTML = '';
+  if (quickPicks.length === 0) {
+    container.innerHTML = '<div style="font-size: 10px; color: #a8a29e;">no meals in plan yet</div>';
+  } else {
+    quickPicks.forEach(meal => {
+      const btn = document.createElement('button');
+      btn.className = 'log-quick-pick';
+      btn.innerHTML = `<div>${meal.name}</div><span>${meal.macros.cal} cal</span>`;
+      btn.onclick = () => {
+        addFoodItem(slot, meal.name, meal.macros);
+        closeAddFood();
+      };
+      container.appendChild(btn);
+    });
+  }
+
+  // Populate my foods
+  const myFoodsSection = document.getElementById('log-my-foods-section');
+  const myFoodsContainer = document.getElementById('log-my-foods');
+  if (myFoods.length > 0) {
+    myFoodsSection.style.display = 'block';
+    myFoodsContainer.innerHTML = '';
+    myFoods.forEach(food => {
+      const btn = document.createElement('button');
+      btn.className = 'log-quick-pick';
+      btn.innerHTML = `<div>${food.name}</div><span>${food.macros.cal} cal</span>`;
+      btn.onclick = () => {
+        addFoodItem(slot, food.name, {...food.macros});
+        closeAddFood();
+      };
+      myFoodsContainer.appendChild(btn);
+    });
+  } else {
+    myFoodsSection.style.display = 'none';
+  }
+
+  // Clear search + custom form
+  document.getElementById('log-search-input').value = '';
+  document.getElementById('log-search-results').innerHTML = '';
+  document.getElementById('custom-food-name').value = '';
+  ['custom-cal','custom-p','custom-c','custom-f'].forEach(id => document.getElementById(id).value = '');
+
+  // Show panel
+  document.getElementById('log-add-food-panel').classList.add('open');
+}
+
+function closeAddFood() {
+  document.getElementById('log-add-food-panel').classList.remove('open');
+  addFoodSlot = null;
+}
+
+function addCustomFood(save) {
+  const name = document.getElementById('custom-food-name').value.trim();
+  const cal = parseFloat(document.getElementById('custom-cal').value) || 0;
+  const p = parseFloat(document.getElementById('custom-p').value) || 0;
+  const c = parseFloat(document.getElementById('custom-c').value) || 0;
+  const f = parseFloat(document.getElementById('custom-f').value) || 0;
+  if (!name) { alert('give your food a name'); return; }
+  if (cal === 0 && p === 0 && c === 0 && f === 0) { alert('add at least one macro value'); return; }
+  const macros = {cal, p, c, f};
+  if (save) {
+    const already = myFoods.find(x => x.name.toLowerCase() === name.toLowerCase());
+    if (!already) myFoods.push({name, macros: {...macros}});
+  }
+  addFoodItem(addFoodSlot, name, macros);
+  closeAddFood();
+}
+
+function addFoodItem(slot, name, macros) {
+  if (!slot || !loggedFoods[slot]) return;
+  loggedFoods[slot].push({name, macros});
+  renderSlotItems(slot);
+  updateLogTotals();
+}
+
+function removeFoodItem(slot, index) {
+  if (!slot || !loggedFoods[slot]) return;
+  loggedFoods[slot].splice(index, 1);
+  renderSlotItems(slot);
+  updateLogTotals();
+}
+
+function renderSlotItems(slot) {
+  const container = document.getElementById('log-items-' + slot);
+  if (!container) return;
+  container.innerHTML = '';
+  loggedFoods[slot].forEach((item, idx) => {
+    const row = document.createElement('div');
+    row.className = 'log-item';
+    row.innerHTML = `
+      <div class="log-item-name">${item.name}</div>
+      <div class="log-item-macros">${item.macros.cal} cal</div>
+      <button class="log-item-remove" onclick="removeFoodItem('${slot}', ${idx})">×</button>
+    `;
+    container.appendChild(row);
+  });
+}
+
+function updateLogTotals() {
+  const totals = {cal:0, p:0, c:0, f:0};
+
+  // Sum all logged foods
+  logSlots.forEach(slot => {
+    loggedFoods[slot].forEach(item => {
+      totals.cal += item.macros.cal || 0;
+      totals.p += item.macros.p || 0;
+      totals.c += item.macros.c || 0;
+      totals.f += item.macros.f || 0;
+    });
+  });
+
+  // Update slot headers
+  logSlots.forEach(slot => {
+    let slotCal = 0;
+    loggedFoods[slot].forEach(item => {
+      slotCal += item.macros.cal || 0;
+    });
+    document.getElementById('log-cal-' + slot).textContent = slotCal + ' cal';
+  });
+
+  // Update totals display
+  ['cal','p','c','f'].forEach(m => {
+    const valEl = document.getElementById('log-total-' + m);
+    const barEl = document.getElementById('log-bar-' + m);
+    valEl.textContent = m === 'cal' ? Math.round(totals[m]) : Math.round(totals[m]) + 'g';
+    const pct = Math.min(100, (totals[m] / macroTargets[m]) * 100);
+    barEl.style.width = pct + '%';
+    const over = totals[m] > macroTargets[m] * 1.05;
+    const good = pct >= 90 && !over;
+    barEl.style.background = over ? '#dc2626' : good ? '#10b981' : '#0d9488';
+  });
+}
+
+function addWater(oz) {
+  waterOz += oz;
+  updateWaterDisplay();
+}
+
+function resetWater() {
+  waterOz = 0;
+  updateWaterDisplay();
+}
+
+function customWater() {
+  const input = document.getElementById('log-water-custom-input');
+  const val = parseFloat(input.value) || 0;
+  if (val > 0) {
+    waterOz += val;
+    input.value = '';
+    updateWaterDisplay();
+  }
+}
+
+function updateWaterDisplay() {
+  document.getElementById('log-water-oz').textContent = waterOz;
+  const pct = Math.min(100, (waterOz / waterTarget) * 100);
+  const barEl = document.getElementById('log-bar-water');
+  barEl.style.width = pct + '%';
+  barEl.style.background = waterOz >= waterTarget ? '#10b981' : '#0d9488';
+}
+
+function getQuickPicks(slot) {
+  const meals = [];
+  const seen = new Set();
+  const phases = ['menstrual','follicular','ovulatory','luteal'];
+
+  phases.forEach(phase => {
+    if (!recipes[phase]) return;
+    ['day1', 'day2'].forEach(day => {
+      const dayData = recipes[phase][day];
+      if (dayData && dayData.meals) {
+        dayData.meals.forEach(meal => {
+          if (meal.slot === slot && !seen.has(meal.name)) {
+            seen.add(meal.name);
+            meals.push({name: meal.name, macros: meal.macros});
+          }
+        });
+      }
+    });
+  });
+
+  return meals;
+}
+
+let lastSearchQuery = '';
+function debounceSearch() {
+  clearTimeout(searchTimeout);
+  const query = document.getElementById('log-search-input').value.trim();
+  if (query === lastSearchQuery) return;
+  if (query.length < 2) {
+    document.getElementById('log-search-results').innerHTML = '';
+    return;
+  }
+  lastSearchQuery = query;
+  searchTimeout = setTimeout(() => searchUSDA(query), 300);
+}
+
+function searchUSDA(query) {
+  const resultsEl = document.getElementById('log-search-results');
+  resultsEl.innerHTML = '<div class="log-search-loading">searching...</div>';
+
+  const url = 'https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY&query=' +
+    encodeURIComponent(query) + '&pageSize=10&dataType=Foundation,SR%20Legacy,Branded';
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      resultsEl.innerHTML = '';
+      if (!data.foods || data.foods.length === 0) {
+        resultsEl.innerHTML = '<div class="log-search-loading">no foods found</div>';
+        return;
+      }
+
+      data.foods.forEach(food => {
+        let name = food.description || 'Unknown';
+        const brand = food.brandName || food.brandOwner || '';
+        if (brand) name = brand.split(',')[0] + ' — ' + name;
+        name = name.length > 60 ? name.slice(0, 57) + '...' : name;
+        const serving = food.servingSize || 100;
+        const servingUnit = food.servingSizeUnit || 'g';
+
+        let cal = 0, p = 0, c = 0, f = 0;
+        if (food.foodNutrients) {
+          food.foodNutrients.forEach(n => {
+            if (n.nutrientName.includes('Energy') && n.unitName === 'kcal') cal = n.value || 0;
+            if (n.nutrientName === 'Protein' && n.unitName === 'G') p = n.value || 0;
+            if (n.nutrientName === 'Carbohydrate, by difference' && n.unitName === 'G') c = n.value || 0;
+            if (n.nutrientName === 'Total lipid (fat)' && n.unitName === 'G') f = n.value || 0;
+          });
+        }
+
+        const result = document.createElement('div');
+        result.className = 'log-search-result';
+        result.innerHTML = `
+          <div class="log-search-result-name">${name}</div>
+          <div class="log-search-result-info">${serving}${servingUnit} · ${Math.round(cal)} cal · ${Math.round(p)}p ${Math.round(c)}c ${Math.round(f)}f</div>
+        `;
+        result.onclick = () => {
+          addFromSearch(name, cal, p, c, f, serving, servingUnit);
+          closeAddFood();
+        };
+        resultsEl.appendChild(result);
+      });
+    })
+    .catch(err => {
+      resultsEl.innerHTML = '<div class="log-search-loading">search error</div>';
+      console.error(err);
+    });
+}
+
+function addFromSearch(name, cal, p, c, f, servingSize, servingUnit) {
+  if (!addFoodSlot) return;
+  addFoodItem(addFoodSlot, name, {cal: Math.round(cal), p: Math.round(p), c: Math.round(c), f: Math.round(f)});
+}
+
+function changeLogDate(offset) {
+  logDate.setDate(logDate.getDate() + offset);
+  const today = new Date();
+  const isToday = logDate.toDateString() === today.toDateString();
+  const display = document.getElementById('log-date-display');
+  if (isToday) {
+    display.textContent = 'today';
+  } else {
+    const opts = {weekday:'short', month:'short', day:'numeric'};
+    display.textContent = logDate.toLocaleDateString('en-US', opts).toLowerCase();
+  }
+  // Clear logged foods and water for new date (no persistence yet)
+  logSlots.forEach(slot => loggedFoods[slot] = []);
+  waterOz = 0;
+  logSlots.forEach(slot => renderSlotItems(slot));
+  updateWaterDisplay();
+  updateLogTotals();
+  closeAddFood();
+}
+
+function prefillFromPlan() {
+  if (!lastBuild || !lastBuild.selections) {
+    alert('build your weekly plan first in the "plan my week" tab');
+    return;
+  }
+  // Gather all selected day meals across phases
+  const allMeals = [];
+  const phases = ['menstrual','follicular','ovulatory','luteal'];
+  phases.forEach(phase => {
+    const sel = lastBuild.selections[phase];
+    if (!sel) return;
+    const dayData = recipes[phase][sel];
+    if (dayData && dayData.meals) {
+      dayData.meals.forEach(m => allMeals.push(m));
+    }
+  });
+  if (allMeals.length === 0) {
+    alert('no meals selected yet — go to "plan my week" and build your plan first');
+    return;
+  }
+
+  // Add meals to their slots
+  logSlots.forEach(slot => {
+    loggedFoods[slot] = [];
+  });
+  allMeals.forEach(meal => {
+    addFoodItem(meal.slot, meal.name, meal.macros);
+  });
+}
+
+function copyDailyLog() {
+  const display = document.getElementById('log-date-display').textContent;
+  let text = 'daily log — ' + display + '\n\n';
+  logSlots.forEach(slot => {
+    const label = slot === 'snack1' ? 'snack 1' : slot === 'snack2' ? 'snack 2' : slot;
+    text += label + ':\n';
+    if (loggedFoods[slot].length === 0) {
+      text += '  (none)\n';
+    } else {
+      loggedFoods[slot].forEach(item => {
+        text += '  • ' + item.name + ' (' + item.macros.cal + ' cal, ' + item.macros.p + 'p, ' + item.macros.c + 'c, ' + item.macros.f + 'f)\n';
+      });
+    }
+    text += '\n';
+  });
+  text += 'totals: ' + document.getElementById('log-total-cal').textContent + ' cal · '
+    + document.getElementById('log-total-p').textContent + ' P · '
+    + document.getElementById('log-total-c').textContent + ' C · '
+    + document.getElementById('log-total-f').textContent + ' F\n';
+  text += 'water: ' + waterOz + ' / 120 oz\n';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('.log-action-btn:last-child');
+    const orig = btn.textContent;
+    btn.textContent = 'copied!';
+    setTimeout(() => btn.textContent = orig, 1500);
+  });
+}
+
+function initLog() {
+  // Initialize log on page load
+  logSlots.forEach(slot => {
+    renderSlotItems(slot);
+  });
+  updateWaterDisplay();
+  updateLogTotals();
+}
+
+// Init calendar and log on load
+initCalendar();
+initLog();
+</script>
+
+</body>
+</html>
