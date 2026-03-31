@@ -86,6 +86,7 @@
   .tab.active-luteal { color: #5b21b6; border-bottom-color: #5b21b6; }
   .tab.active-prep { color: #1e40af; border-bottom-color: #1e40af; }
   .tab.active-log { color: #0d9488; border-bottom-color: #0d9488; }
+  .tab.active-calc { color: #7c3aed; border-bottom-color: #7c3aed; }
 
   .phase-content { display: none; }
   .phase-content.active { display: block; }
@@ -1273,6 +1274,315 @@
   }
   .log-action-btn:hover { border-color: #0d9488; color: #0d9488; }
 
+  /* ===== MACRO CALCULATOR ===== */
+  .calc-section { }
+  .calc-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eee8e0;
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .calc-section-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #8a8580;
+    margin-bottom: 14px;
+  }
+  .calc-input-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .calc-input-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #6b6560;
+    margin-bottom: 5px;
+  }
+  .calc-input-field {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1.5px solid #eee8e0;
+    border-radius: 8px;
+    font-size: 15px;
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    color: #2d2a26;
+    background: #faf7f2;
+    transition: border-color 0.15s;
+  }
+  .calc-input-field:focus { outline: none; border-color: #7c3aed; background: white; }
+  .calc-input-field::placeholder { color: #d4cfc8; }
+  .calc-pill-options {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .calc-pill-opt {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    border: 1.5px solid #eee8e0;
+    background: white;
+    color: #6b6560;
+    transition: all 0.15s;
+  }
+  .calc-pill-opt:hover { border-color: #d4cfc8; }
+  .calc-pill-opt.selected {
+    background: #ede9fe;
+    border-color: #ede9fe;
+    color: #7c3aed;
+  }
+  .calc-activity-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .calc-activity-opt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1.5px solid #eee8e0;
+    background: white;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .calc-activity-opt:hover { border-color: #d4cfc8; }
+  .calc-activity-opt.selected { border-color: #7c3aed; background: #faf7f2; }
+  .calc-activity-opt.selected .calc-activity-dot { background: #7c3aed; border-color: #7c3aed; }
+  .calc-activity-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #d4cfc8;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .calc-activity-text { font-size: 13px; color: #2d2a26; font-weight: 500; }
+  .calc-activity-detail { font-size: 11px; color: #a8a29e; margin-top: 1px; }
+  .calc-goal-opts {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .calc-goal-opt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border: 1.5px solid #eee8e0;
+    background: white;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .calc-goal-opt:hover { border-color: #d4cfc8; }
+  .calc-goal-opt.selected { border-color: #7c3aed; background: #faf7f2; }
+  .calc-goal-opt.selected .calc-goal-dot { background: #7c3aed; border-color: #7c3aed; }
+  .calc-goal-left { display: flex; align-items: center; gap: 12px; }
+  .calc-goal-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #d4cfc8;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .calc-goal-label { font-size: 13px; font-weight: 500; color: #2d2a26; }
+  .calc-goal-deficit { font-size: 11px; color: #a8a29e; }
+  .calc-btn {
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 24px;
+    border: none;
+    background: #7c3aed;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    margin-top: 8px;
+    transition: background 0.15s;
+  }
+  .calc-btn:hover { background: #6d28d9; }
+  .calc-results-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid #eee8e0;
+    padding: 28px;
+    margin-top: 20px;
+    display: none;
+  }
+  .calc-results-card.show { display: block; }
+  .calc-results-title {
+    font-family: 'Fraunces', serif;
+    font-size: 22px;
+    color: #2d2a26;
+    margin-bottom: 4px;
+  }
+  .calc-results-subtitle {
+    font-size: 13px;
+    color: #8a8580;
+    margin-bottom: 20px;
+  }
+  .calc-results-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .calc-result-box {
+    background: #faf7f2;
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .calc-result-box.highlight {
+    background: #ede9fe;
+    grid-column: 1 / -1;
+  }
+  .calc-result-number {
+    font-family: 'Fraunces', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: #2d2a26;
+  }
+  .calc-result-box.highlight .calc-result-number { color: #7c3aed; font-size: 40px; }
+  .calc-result-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #8a8580;
+    margin-top: 2px;
+  }
+  .calc-result-detail {
+    font-size: 11px;
+    color: #a8a29e;
+    margin-top: 4px;
+  }
+  .calc-macro-split-results {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .calc-macro-box {
+    text-align: center;
+    padding: 16px 12px;
+    border-radius: 10px;
+  }
+  .calc-macro-box.protein { background: #d1fae5; }
+  .calc-macro-box.carbs { background: #fef3c7; }
+  .calc-macro-box.fat { background: #fce7f3; }
+  .calc-macro-grams {
+    font-family: 'Fraunces', serif;
+    font-size: 28px;
+    font-weight: 700;
+  }
+  .calc-macro-box.protein .calc-macro-grams { color: #065f46; }
+  .calc-macro-box.carbs .calc-macro-grams { color: #92400e; }
+  .calc-macro-box.fat .calc-macro-grams { color: #9d174d; }
+  .calc-macro-name {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
+  .calc-macro-box.protein .calc-macro-name { color: #065f46; }
+  .calc-macro-box.carbs .calc-macro-name { color: #92400e; }
+  .calc-macro-box.fat .calc-macro-name { color: #9d174d; }
+  .calc-macro-pct {
+    font-size: 11px;
+    color: #a8a29e;
+    margin-top: 2px;
+  }
+  .calc-bar-section { margin-bottom: 20px; }
+  .calc-bar-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #8a8580;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .calc-bar-track {
+    height: 24px;
+    background: #f5f0ea;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+  }
+  .calc-bar-seg-p { background: #d1fae5; height: 100%; transition: width 0.5s; }
+  .calc-bar-seg-c { background: #fef3c7; height: 100%; transition: width 0.5s; }
+  .calc-bar-seg-f { background: #fce7f3; height: 100%; transition: width 0.5s; }
+  .calc-bar-legend {
+    display: flex;
+    gap: 16px;
+    margin-top: 6px;
+  }
+  .calc-bar-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    color: #8a8580;
+  }
+  .calc-bar-legend-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .calc-apply-btn {
+    width: 100%;
+    padding: 14px 24px;
+    border-radius: 24px;
+    border: none;
+    background: #059669;
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .calc-apply-btn:hover { background: #047857; }
+  .calc-apply-note {
+    font-size: 12px;
+    color: #a8a29e;
+    text-align: center;
+    margin-top: 8px;
+  }
+  .calc-tip-box {
+    background: #f5f0ea;
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #6b6560;
+    line-height: 1.6;
+  }
+  .calc-tip-box strong { color: #2d2a26; }
+  .calc-warning {
+    background: #fef3c7;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-top: 12px;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+  }
+
   .footer {
     text-align: center;
     font-size: 13px;
@@ -1306,19 +1616,22 @@
     .log-split { grid-template-columns: 1fr; }
     .log-sidebar { position: static; }
     .log-add-food-panel { width: 100%; left: 0; }
+    .calc-input-row { grid-template-columns: 1fr; }
+    .calc-results-grid { grid-template-columns: 1fr; }
+    .calc-result-box.highlight { grid-column: auto; }
+    .calc-macro-split-results { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
 <h1>cycle synced meal plan</h1>
-<p class="subtitle">anti-inflammatory · weight loss · 1-2x/week activity · meal prep sundays</p>
 
-<div class="macro-targets">
-  <div class="macro-pill"><span>1,806</span> cal</div>
-  <div class="macro-pill"><span>135g</span> protein</div>
-  <div class="macro-pill"><span>181g</span> carbs</div>
-  <div class="macro-pill"><span>60g</span> fat</div>
+<div class="macro-targets" id="macro-targets-bar">
+  <div class="macro-pill" id="pill-cal"><span>1,806</span> cal</div>
+  <div class="macro-pill" id="pill-protein"><span>135g</span> protein</div>
+  <div class="macro-pill" id="pill-carbs"><span>181g</span> carbs</div>
+  <div class="macro-pill" id="pill-fat"><span>60g</span> fat</div>
   <div class="macro-pill"><span>26g</span> fiber</div>
 </div>
 
@@ -1330,6 +1643,7 @@
   <button class="tab" onclick="showPhase('luteal', this)">luteal</button>
   <button class="tab" onclick="showPhase('prep', this)">sunday prep</button>
   <button class="tab" onclick="showPhase('log', this)">daily log</button>
+  <button class="tab" onclick="showPhase('calc', this)">macro calc</button>
 </div>
 
 <!-- PLANNER -->
@@ -2645,6 +2959,166 @@
   </div>
 </div>
 
+<!-- MACRO CALCULATOR -->
+<div id="phase-calc" class="phase-content calc-section">
+  <div class="phase-header">
+    <div class="phase-icon" style="background: #ede9fe;"><i class="ph ph-calculator" style="color: #7c3aed;"></i></div>
+    <div class="phase-title" style="color: #7c3aed;">macro calculator</div>
+  </div>
+  <p class="phase-desc">figure out your daily calorie + macro targets using the mifflin-st jeor equation. hit "apply" to update your whole meal plan.</p>
+
+  <div class="calc-card">
+    <div class="calc-section-label">your stats</div>
+    <div class="calc-input-row">
+      <div class="calc-input-group">
+        <div class="calc-input-label">age</div>
+        <input class="calc-input-field" type="number" id="calc-age" placeholder="28">
+      </div>
+      <div class="calc-input-group">
+        <div class="calc-input-label">height</div>
+        <div style="display:flex;gap:6px;">
+          <input class="calc-input-field" type="number" id="calc-feet" placeholder="5" style="width:50%;">
+          <input class="calc-input-field" type="number" id="calc-inches" placeholder="6" style="width:50%;">
+        </div>
+      </div>
+    </div>
+    <div class="calc-input-row">
+      <div class="calc-input-group">
+        <div class="calc-input-label">weight (lbs)</div>
+        <input class="calc-input-field" type="number" id="calc-weight" placeholder="145">
+      </div>
+      <div class="calc-input-group">
+        <div class="calc-input-label">sex</div>
+        <div class="calc-pill-options" id="calc-sex-pills">
+          <button class="calc-pill-opt selected" data-val="female" onclick="calcSelectPill(this, 'calc-sex-pills')">female</button>
+          <button class="calc-pill-opt" data-val="male" onclick="calcSelectPill(this, 'calc-sex-pills')">male</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-card">
+    <div class="calc-section-label">activity level</div>
+    <div class="calc-activity-opts" id="calc-activity-opts">
+      <div class="calc-activity-opt" data-val="1.2" onclick="calcSelectRadio(this, 'calc-activity-opts')">
+        <div class="calc-activity-dot"></div>
+        <div><div class="calc-activity-text">sedentary</div><div class="calc-activity-detail">desk job, little to no exercise</div></div>
+      </div>
+      <div class="calc-activity-opt selected" data-val="1.375" onclick="calcSelectRadio(this, 'calc-activity-opts')">
+        <div class="calc-activity-dot"></div>
+        <div><div class="calc-activity-text">lightly active</div><div class="calc-activity-detail">1-2x/week — walks, yoga, light workouts</div></div>
+      </div>
+      <div class="calc-activity-opt" data-val="1.55" onclick="calcSelectRadio(this, 'calc-activity-opts')">
+        <div class="calc-activity-dot"></div>
+        <div><div class="calc-activity-text">moderately active</div><div class="calc-activity-detail">3-5x/week — gym, running, group fitness</div></div>
+      </div>
+      <div class="calc-activity-opt" data-val="1.725" onclick="calcSelectRadio(this, 'calc-activity-opts')">
+        <div class="calc-activity-dot"></div>
+        <div><div class="calc-activity-text">very active</div><div class="calc-activity-detail">6-7x/week — intense training, physical job</div></div>
+      </div>
+      <div class="calc-activity-opt" data-val="1.9" onclick="calcSelectRadio(this, 'calc-activity-opts')">
+        <div class="calc-activity-dot"></div>
+        <div><div class="calc-activity-text">extra active</div><div class="calc-activity-detail">2x/day training or very physical job + exercise</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-card">
+    <div class="calc-section-label">goal</div>
+    <div class="calc-goal-opts" id="calc-goal-opts">
+      <div class="calc-goal-opt selected" data-val="0.10" onclick="calcSelectRadio(this, 'calc-goal-opts')">
+        <div class="calc-goal-left"><div class="calc-goal-dot"></div><div class="calc-goal-label">gentle cut</div></div>
+        <div class="calc-goal-deficit">10% deficit</div>
+      </div>
+      <div class="calc-goal-opt" data-val="0.15" onclick="calcSelectRadio(this, 'calc-goal-opts')">
+        <div class="calc-goal-left"><div class="calc-goal-dot"></div><div class="calc-goal-label">moderate cut</div></div>
+        <div class="calc-goal-deficit">15% deficit</div>
+      </div>
+      <div class="calc-goal-opt" data-val="0.20" onclick="calcSelectRadio(this, 'calc-goal-opts')">
+        <div class="calc-goal-left"><div class="calc-goal-dot"></div><div class="calc-goal-label">aggressive cut</div></div>
+        <div class="calc-goal-deficit">20% deficit</div>
+      </div>
+      <div class="calc-goal-opt" data-val="0" onclick="calcSelectRadio(this, 'calc-goal-opts')">
+        <div class="calc-goal-left"><div class="calc-goal-dot"></div><div class="calc-goal-label">maintain</div></div>
+        <div class="calc-goal-deficit">no deficit</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="calc-card">
+    <div class="calc-section-label">macro split</div>
+    <div class="calc-pill-options" id="calc-split-pills" style="margin-bottom: 8px;">
+      <button class="calc-pill-opt selected" data-val="standard" onclick="calcSelectPill(this, 'calc-split-pills')">standard</button>
+      <button class="calc-pill-opt" data-val="high-protein" onclick="calcSelectPill(this, 'calc-split-pills')">high protein</button>
+      <button class="calc-pill-opt" data-val="low-carb" onclick="calcSelectPill(this, 'calc-split-pills')">low carb</button>
+    </div>
+    <div style="font-size:12px; color:#a8a29e;" id="calc-split-desc">40% carbs · 30% protein · 30% fat</div>
+  </div>
+
+  <button class="calc-btn" onclick="calculateMacros()">calculate my macros</button>
+
+  <div class="calc-results-card" id="calc-results">
+    <div class="calc-results-title">your daily targets</div>
+    <div class="calc-results-subtitle" id="calc-results-method"></div>
+
+    <div class="calc-results-grid">
+      <div class="calc-result-box highlight">
+        <div class="calc-result-number" id="calc-r-cal">—</div>
+        <div class="calc-result-label">calories / day</div>
+      </div>
+      <div class="calc-result-box">
+        <div class="calc-result-number" id="calc-r-bmr">—</div>
+        <div class="calc-result-label">bmr</div>
+        <div class="calc-result-detail">calories at rest</div>
+      </div>
+      <div class="calc-result-box">
+        <div class="calc-result-number" id="calc-r-tdee">—</div>
+        <div class="calc-result-label">tdee</div>
+        <div class="calc-result-detail">maintenance calories</div>
+      </div>
+    </div>
+
+    <div class="calc-macro-split-results">
+      <div class="calc-macro-box protein">
+        <div class="calc-macro-grams" id="calc-r-protein">—</div>
+        <div class="calc-macro-name">protein</div>
+        <div class="calc-macro-pct" id="calc-r-protein-pct"></div>
+      </div>
+      <div class="calc-macro-box carbs">
+        <div class="calc-macro-grams" id="calc-r-carbs">—</div>
+        <div class="calc-macro-name">carbs</div>
+        <div class="calc-macro-pct" id="calc-r-carbs-pct"></div>
+      </div>
+      <div class="calc-macro-box fat">
+        <div class="calc-macro-grams" id="calc-r-fat">—</div>
+        <div class="calc-macro-name">fat</div>
+        <div class="calc-macro-pct" id="calc-r-fat-pct"></div>
+      </div>
+    </div>
+
+    <div class="calc-bar-section">
+      <div class="calc-bar-label">calorie breakdown</div>
+      <div class="calc-bar-track">
+        <div class="calc-bar-seg-p" id="calc-bar-p" style="width:30%"></div>
+        <div class="calc-bar-seg-c" id="calc-bar-c" style="width:40%"></div>
+        <div class="calc-bar-seg-f" id="calc-bar-f" style="width:30%"></div>
+      </div>
+      <div class="calc-bar-legend">
+        <div class="calc-bar-legend-item"><div class="calc-bar-legend-dot" style="background:#d1fae5;"></div> protein</div>
+        <div class="calc-bar-legend-item"><div class="calc-bar-legend-dot" style="background:#fef3c7;"></div> carbs</div>
+        <div class="calc-bar-legend-item"><div class="calc-bar-legend-dot" style="background:#fce7f3;"></div> fat</div>
+      </div>
+    </div>
+
+    <button class="calc-apply-btn" onclick="applyCalcTargets()">apply to my meal plan</button>
+    <div class="calc-apply-note">updates your daily targets + daily log tracker</div>
+
+    <div class="calc-tip-box">
+      <strong>how this works →</strong> uses the mifflin-st jeor equation. your bmr is what you'd burn lying in bed all day. tdee factors in your activity. the deficit is a percentage off your tdee (10-20%). macro grams are calculated from total cals using your chosen split. don't go below 1,400 cal/day for active women — start conservatively and adjust by 50-100 cal after 2-3 weeks if needed.
+    </div>
+  </div>
+</div>
+
 <div class="footer">
   cycle synced meal plan — built for sierra<br>
   last updated march 2026
@@ -2794,7 +3268,7 @@ function showPhase(phase, tab) {
   document.querySelectorAll('.phase-content').forEach(el => el.classList.remove('active'));
   document.getElementById('phase-' + phase).classList.add('active');
   document.querySelectorAll('.tab').forEach(t => t.className = 'tab');
-  const colorMap = {planner:'active-planner',menstrual:'active-menstrual',follicular:'active-follicular',ovulatory:'active-ovulatory',luteal:'active-luteal',prep:'active-prep',log:'active-log'};
+  const colorMap = {planner:'active-planner',menstrual:'active-menstrual',follicular:'active-follicular',ovulatory:'active-ovulatory',luteal:'active-luteal',prep:'active-prep',log:'active-log',calc:'active-calc'};
   tab.classList.add(colorMap[phase]);
   if (phase === 'prep') populatePrepTab();
 }
@@ -3428,7 +3902,7 @@ function populatePrepTab() {
 // ===== DAILY LOG =====
 let logDate = new Date();
 const logSlots = ['breakfast','snack1','lunch','snack2','dinner'];
-const macroTargets = {cal:1806, p:135, c:181, f:60};
+let macroTargets = {cal:1806, p:135, c:181, f:60};
 const waterTarget = 120; // oz
 let waterOz = 0;
 let loggedFoods = {breakfast:[], snack1:[], lunch:[], snack2:[], dinner:[]};
@@ -3784,6 +4258,133 @@ function initLog() {
   });
   updateWaterDisplay();
   updateLogTotals();
+}
+
+// ===== MACRO CALCULATOR =====
+function calcSelectPill(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' .calc-pill-opt').forEach(p => p.classList.remove('selected'));
+  el.classList.add('selected');
+  if (groupId === 'calc-split-pills') {
+    const descs = {
+      'standard': '40% carbs · 30% protein · 30% fat',
+      'high-protein': '35% protein · 35% carbs · 30% fat',
+      'low-carb': '35% protein · 25% carbs · 40% fat'
+    };
+    document.getElementById('calc-split-desc').textContent = descs[el.dataset.val];
+  }
+}
+
+function calcSelectRadio(el, groupId) {
+  document.querySelectorAll('#' + groupId + ' > div').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function calcGetSelected(groupId) {
+  const sel = document.querySelector('#' + groupId + ' .selected');
+  return sel ? sel.dataset.val : null;
+}
+
+function calculateMacros() {
+  const age = parseFloat(document.getElementById('calc-age').value) || 28;
+  const feet = parseFloat(document.getElementById('calc-feet').value) || 5;
+  const inches = parseFloat(document.getElementById('calc-inches').value) || 6;
+  const weight = parseFloat(document.getElementById('calc-weight').value) || 145;
+  const sex = calcGetSelected('calc-sex-pills');
+  const activity = parseFloat(calcGetSelected('calc-activity-opts')) || 1.375;
+  const deficitPct = parseFloat(calcGetSelected('calc-goal-opts')) || 0;
+  const split = calcGetSelected('calc-split-pills') || 'standard';
+
+  // Convert to metric
+  const heightCm = (feet * 30.48) + (inches * 2.54);
+  const weightKg = weight * 0.453592;
+
+  // Mifflin-St Jeor
+  let bmr;
+  if (sex === 'female') {
+    bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) - 161;
+  } else {
+    bmr = (10 * weightKg) + (6.25 * heightCm) - (5 * age) + 5;
+  }
+  bmr = Math.round(bmr);
+
+  const tdee = Math.round(bmr * activity);
+  // Percentage-based deficit
+  const target = Math.round(tdee * (1 - deficitPct));
+
+  // Safety warning
+  const warningEl = document.getElementById('calc-warning');
+  if (warningEl) warningEl.remove();
+  if (sex === 'female' && target < 1400) {
+    const warn = document.createElement('div');
+    warn.id = 'calc-warning';
+    warn.className = 'calc-warning';
+    warn.innerHTML = '<strong>heads up:</strong> your target is below 1,400 cal/day. for active women, going too low can slow your metabolism and affect hormones. consider a gentler deficit or talk to your dietitian.';
+    document.getElementById('calc-results').appendChild(warn);
+  }
+
+  // Macro splits
+  const splits = {
+    'standard': { p: 0.30, c: 0.40, f: 0.30 },
+    'high-protein': { p: 0.35, c: 0.35, f: 0.30 },
+    'low-carb': { p: 0.35, c: 0.25, f: 0.40 }
+  };
+  const s = splits[split];
+  const proteinG = Math.round((target * s.p) / 4);
+  const carbsG = Math.round((target * s.c) / 4);
+  const fatG = Math.round((target * s.f) / 9);
+
+  // Activity + goal labels
+  const actLabels = {'1.2':'sedentary','1.375':'lightly active','1.55':'moderately active','1.725':'very active','1.9':'extra active'};
+  const goalLabels = {'0.1':'10% deficit','0.15':'15% deficit','0.2':'20% deficit','0':'maintain'};
+
+  document.getElementById('calc-r-cal').textContent = target.toLocaleString();
+  document.getElementById('calc-r-bmr').textContent = bmr.toLocaleString();
+  document.getElementById('calc-r-tdee').textContent = tdee.toLocaleString();
+  document.getElementById('calc-r-protein').textContent = proteinG + 'g';
+  document.getElementById('calc-r-carbs').textContent = carbsG + 'g';
+  document.getElementById('calc-r-fat').textContent = fatG + 'g';
+  document.getElementById('calc-r-protein-pct').textContent = Math.round(s.p * 100) + '%';
+  document.getElementById('calc-r-carbs-pct').textContent = Math.round(s.c * 100) + '%';
+  document.getElementById('calc-r-fat-pct').textContent = Math.round(s.f * 100) + '%';
+  document.getElementById('calc-bar-p').style.width = (s.p * 100) + '%';
+  document.getElementById('calc-bar-c').style.width = (s.c * 100) + '%';
+  document.getElementById('calc-bar-f').style.width = (s.f * 100) + '%';
+  document.getElementById('calc-results-method').textContent = 'mifflin-st jeor · ' + (actLabels[activity] || 'custom') + ' · ' + (goalLabels[deficitPct] || 'custom');
+
+  // Store for apply
+  window._calcResults = { cal: target, p: proteinG, c: carbsG, f: fatG };
+
+  document.getElementById('calc-results').classList.add('show');
+  document.getElementById('calc-results').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function applyCalcTargets() {
+  if (!window._calcResults) return;
+  const r = window._calcResults;
+
+  // Update global macroTargets
+  macroTargets.cal = r.cal;
+  macroTargets.p = r.p;
+  macroTargets.c = r.c;
+  macroTargets.f = r.f;
+
+  // Update header macro pills
+  document.getElementById('pill-cal').innerHTML = '<span>' + r.cal.toLocaleString() + '</span> cal';
+  document.getElementById('pill-protein').innerHTML = '<span>' + r.p + 'g</span> protein';
+  document.getElementById('pill-carbs').innerHTML = '<span>' + r.c + 'g</span> carbs';
+  document.getElementById('pill-fat').innerHTML = '<span>' + r.f + 'g</span> fat';
+
+  // Re-render daily log progress bars
+  updateLogTotals();
+
+  // Button feedback
+  const btn = document.querySelector('.calc-apply-btn');
+  btn.textContent = 'applied! ✓';
+  btn.style.background = '#065f46';
+  setTimeout(() => {
+    btn.textContent = 'apply to my meal plan';
+    btn.style.background = '#059669';
+  }, 2000);
 }
 
 // Init calendar and log on load
