@@ -1650,7 +1650,7 @@
   <button class="tab" onclick="showPhase('follicular', this)">follicular</button>
   <button class="tab" onclick="showPhase('ovulatory', this)">ovulatory</button>
   <button class="tab" onclick="showPhase('luteal', this)">luteal</button>
-  <button class="tab" onclick="showPhase('prep', this)">sunday prep</button>
+  <button class="tab" onclick="showPhase('prep', this)">prep guide</button>
   <button class="tab" onclick="showPhase('log', this)">daily log</button>
   <button class="tab" onclick="showPhase('calc', this)">macro calc</button>
 </div>
@@ -2741,11 +2741,11 @@
   </div>
 </div>
 
-<!-- SUNDAY PREP -->
+<!-- PREP GUIDE -->
 <div id="phase-prep" class="phase-content prep-section">
   <div class="phase-header">
     <div class="phase-icon" style="background: #dbeafe;"><i class="ph ph-knife"></i></div>
-    <div class="phase-title">sunday prep</div>
+    <div class="phase-title">prep guide</div>
   </div>
   <p class="phase-desc" id="prep-tab-desc">plan your week first, then come here — your prep guide, grocery list, and timeline will appear based on what you're actually making.</p>
 
@@ -3148,12 +3148,12 @@ const recipes = {
     },
     day2: {
       meals: [
-        {slot:'breakfast', name:'turkish eggs w/ yogurt + sourdough', details:['2 eggs over 1/2c greek yogurt (2%)','1/2 tsp chili oil','1 slice sourdough','1oz feta, 1c arugula'], macros:{cal:435,p:31,c:29,f:21}, grocery:{eggs:2,greek_yogurt:0.5,chili_oil:0.5,sourdough:1,feta:1,arugula:1}},
+        {slot:'breakfast', name:'turkish eggs w/ yogurt + sourdough', details:['2 eggs over 3/4c nonfat greek yogurt','1 tbsp + 1 tsp olive oil','1 slice sourdough','1/2c sliced cucumber'], macros:{cal:462,p:33,c:31,f:26}, grocery:{eggs:2,greek_yogurt:0.75,olive_oil:1.33,sourdough:1,cucumber:0.5}},
         {slot:'snack1', name:'turkey sticks + apple', details:['2oz turkey sticks','1 medium apple'], macros:{cal:165,p:11,c:27,f:2}, grocery:{turkey_sticks:2,apples:1}},
         {slot:'lunch', name:'butternut squash soup + sourdough + chicken', details:['1.5c roasted butternut squash blended w/ 1c broth','1/2 tsp olive oil','1 slice sourdough','4oz shredded chicken'], macros:{cal:408,p:35,c:56,f:7}, grocery:{butternut_squash:1.5,chicken_broth:1,olive_oil:0.5,sourdough:1,chicken_breast:4}},
         {slot:'snack2', name:'cottage cheese + blueberries', details:['3/4c low-fat cottage cheese','1/4c blueberries'], macros:{cal:141,p:20,c:11,f:2}, grocery:{cottage_cheese:0.75,blueberries:0.25}},
         {slot:'dinner', name:'chimichurri salmon w/ gigante beans + roasted veg', details:['5oz salmon','1/2c gigante beans','1c roasted veg','1 tbsp chimichurri','1/2c rice'], macros:{cal:625,p:43,c:60,f:23}, grocery:{salmon:5,gigante_beans:0.5,roasted_veg:1,chimichurri:1,white_rice:0.5}}
-      ], totals:{cal:1774,p:140,c:183,f:55}
+      ], totals:{cal:1801,p:142,c:185,f:60}
     }
   },
   follicular: {
@@ -3208,12 +3208,12 @@ const recipes = {
     },
     day2: {
       meals: [
-        {slot:'breakfast', name:'turkish eggs w/ yogurt + sourdough', details:['2 eggs over 3/4c greek yogurt (2%)','1/2 tsp chili oil','1 slice sourdough','1c arugula'], macros:{cal:397,p:32,c:30,f:16}, grocery:{eggs:2,greek_yogurt:0.75,chili_oil:0.5,sourdough:1,arugula:1}},
+        {slot:'breakfast', name:'turkish eggs w/ yogurt + sourdough', details:['2 eggs over 3/4c nonfat greek yogurt','1 tbsp olive oil','1 slice sourdough','1/2c sliced cucumber'], macros:{cal:437,p:33,c:31,f:20}, grocery:{eggs:2,greek_yogurt:0.75,olive_oil:1,sourdough:1,cucumber:0.5}},
         {slot:'snack1', name:'apple + almond butter', details:['1 medium apple','1 tbsp almond butter'], macros:{cal:193,p:4,c:28,f:9}, grocery:{apples:1,almond_butter:1}},
         {slot:'lunch', name:'butternut squash soup + sourdough + chicken', details:['1.5c roasted butternut squash blended w/ 1c broth','1/2 tsp olive oil','1 slice sourdough','4oz shredded chicken'], macros:{cal:408,p:35,c:56,f:7}, grocery:{butternut_squash:1.5,chicken_broth:1,olive_oil:0.5,sourdough:1,chicken_breast:4}},
         {slot:'snack2', name:'turkey sticks + cottage cheese', details:['2oz turkey sticks','1/2c low-fat cottage cheese'], macros:{cal:150,p:23,c:6,f:3}, grocery:{turkey_sticks:2,cottage_cheese:0.5}},
         {slot:'dinner', name:'steak w/ gigante beans + roasted veg + rice', details:['5oz steak','1/2c gigante beans','1c roasted veg','2 tbsp chimichurri','1/2c rice'], macros:{cal:625,p:46,c:60,f:21}, grocery:{steak:5,gigante_beans:0.5,roasted_veg:1,chimichurri:2,white_rice:0.5}}
-      ], totals:{cal:1773,p:140,c:180,f:56}
+      ], totals:{cal:1813,p:141,c:181,f:60}
     }
   }
 };
@@ -3229,7 +3229,7 @@ const groceryMeta = {
   egg_whites:{name:'egg whites',cat:'proteins',unit:''},
   turkey_sticks:{name:'turkey sticks',cat:'proteins',unit:'oz'},
   chicken_sausage:{name:'chicken sausage links',cat:'proteins',unit:''},
-  greek_yogurt:{name:'greek yogurt (2%)',cat:'dairy',unit:' cups'},
+  greek_yogurt:{name:'nonfat greek yogurt',cat:'dairy',unit:' cups'},
   cottage_cheese:{name:'cottage cheese (low-fat)',cat:'dairy',unit:' cups'},
   feta:{name:'feta',cat:'dairy',unit:'oz'},
   brie:{name:'brie',cat:'dairy',unit:'oz'},
@@ -3617,7 +3617,7 @@ function buildResults() {
 
   lastGroceryText = plainText;
 
-  // Save state for sunday prep tab
+  // Save state for prep guide tab
   const allSelectedMeals = [];
   Object.keys(needs).forEach(phase => {
     const day = selections[phase];
@@ -3656,7 +3656,7 @@ const prepData = {
   'stuffed peppers x2 — shrimp, rice, feta': {type:'oven', order:4, time:'35 min', title:'stuff + bake peppers', steps:'halve peppers → mix shrimp, rice, feta, tomato → stuff → bake 375°F 30 min'},
   'ginger turmeric congee w/ chicken + egg': {type:'stovetop', order:8, time:'35 min', title:'simmer congee', steps:'boil rice in broth → reduce heat, stir occasionally 25 min → add shredded chicken → soft boil eggs separately'},
   'butternut squash soup + sourdough + chicken': {type:'stovetop', order:9, time:'15 min', title:'blend butternut squash soup', steps:'roasted squash + broth in blender → blitz smooth → warm on stove → portion'},
-  'turkish eggs w/ yogurt + sourdough': {type:'cold', order:20, time:'5 min/serving', title:'prep turkish eggs kit', steps:'portion yogurt into containers → portion feta + arugula → eggs cook fresh day-of (2 min)'},
+  'turkish eggs w/ yogurt + sourdough': {type:'cold', order:20, time:'5 min/serving', title:'prep turkish eggs kit', steps:'portion 3/4c nonfat yogurt into containers → drizzle olive oil on top → slice cucumber → eggs cook fresh day-of (2 min)'},
   'smoked salmon + eggs + brie on sourdough': {type:'cold', order:21, time:'5 min', title:'prep smoked salmon kits', steps:'portion smoked salmon + brie + arugula into containers → eggs cook fresh day-of'},
   'feta + gigante beans + eggs + arugula': {type:'cold', order:22, time:'5 min', title:'prep feta bean bowls', steps:'portion beans, feta, tomato, arugula → eggs cook fresh day-of'},
   'egg white buckwheat bowl + chicken sausage': {type:'cold', order:23, time:'5 min', title:'portion buckwheat bowls', steps:'portion cooked buckwheat + blueberries + choc chips → egg whites + sausage cook fresh'},
