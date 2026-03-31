@@ -1573,6 +1573,15 @@
     line-height: 1.6;
   }
   .calc-tip-box strong { color: #2d2a26; }
+  .prep-batch-macros {
+    font-size: 12px;
+    color: #6b6560;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px dashed #eee8e0;
+    font-weight: 500;
+  }
+
   .calc-warning {
     background: #fef3c7;
     border-radius: 8px;
@@ -3787,6 +3796,49 @@ function sendToNotes() {
   }
 }
 
+// ===== BULK QUANTITY SCALER =====
+function scaleDetail(text, multiplier) {
+  if (multiplier <= 1) return text;
+  // Match quantities: "1/3c", "4oz", "2 tbsp", "1/2 tsp", "2 medjool dates", "1 soft-boiled egg"
+  return text.replace(/(\d+\/\d+|\d+\.?\d*)(\s*)(c\b|oz\b|tbsp\b|tsp\b|cups?\b|slices?\b|large\b|medium\b)?/gi, function(match, numStr, space, unit, offset) {
+    let num;
+    if (numStr.includes('/')) {
+      const parts = numStr.split('/');
+      num = parseFloat(parts[0]) / parseFloat(parts[1]);
+    } else {
+      num = parseFloat(numStr);
+    }
+    // Skip scaling numbers in temps, times, or percentages
+    const after = text.slice(offset + match.length, offset + match.length + 5);
+    if (/^°|^F\b|^min|^%/.test(after)) return match;
+    const scaled = num * multiplier;
+    const formatted = formatScaled(scaled);
+    // If no unit was captured, put the space back (it was consumed by \s*)
+    if (!unit && space) return formatted + space;
+    return formatted + (unit ? space + unit : '');
+  });
+}
+
+function formatScaled(n) {
+  // Clean fractions for common cooking amounts
+  if (n === Math.floor(n)) return n.toString();
+  const whole = Math.floor(n);
+  const frac = n - whole;
+  const fracs = {0.25:'¼', 0.33:'⅓', 0.5:'½', 0.67:'⅔', 0.75:'¾'};
+  // Find closest fraction
+  let closest = null;
+  let minDiff = 999;
+  for (const [val, sym] of Object.entries(fracs)) {
+    const diff = Math.abs(frac - parseFloat(val));
+    if (diff < minDiff) { minDiff = diff; closest = sym; }
+  }
+  if (minDiff < 0.05) {
+    return whole > 0 ? whole + ' ' + closest : closest;
+  }
+  // Fall back to decimal
+  return parseFloat(n.toFixed(1)).toString();
+}
+
 // ===== POPULATE SUNDAY PREP TAB =====
 function populatePrepTab() {
   if (!lastBuild) {
@@ -3801,7 +3853,7 @@ function populatePrepTab() {
   const {needs, selections, groceryTotals, categories, allSelectedMeals} = lastBuild;
   const slotLabels = {breakfast:'breakfast',snack1:'snack 1',lunch:'lunch',snack2:'snack 2',dinner:'dinner'};
 
-  // 1. Populate meals list
+  // 1. Populate meals list with BULK quantities
   const mealsContainer = document.getElementById('prep-tab-meals');
   mealsContainer.innerHTML = '';
   allSelectedMeals.forEach(({phase, slot, count, meal}) => {
@@ -3811,9 +3863,16 @@ function populatePrepTab() {
       : meal.name;
     const card = document.createElement('div');
     card.className = 'result-meal-card';
-    card.innerHTML = '<div class="result-meal-header"><div class="result-meal-type">' + slotLabels[slot] + ' · ' + phase + '</div><div class="result-meal-servings">prep ' + count + 'x</div></div>' +
+    const bulkDetails = count > 1
+      ? meal.details.map(d => scaleDetail(d, count))
+      : meal.details;
+    const totalMacros = count > 1
+      ? {cal: meal.macros.cal * count, p: meal.macros.p * count, c: meal.macros.c * count, f: meal.macros.f * count}
+      : meal.macros;
+    card.innerHTML = '<div class="result-meal-header"><div class="result-meal-type">' + slotLabels[slot] + ' · ' + phase + '</div><div class="result-meal-servings">' + (count > 1 ? 'batch of ' + count : '1 serving') + '</div></div>' +
       '<div class="result-meal-name">' + nameHtml + '</div>' +
-      '<div class="result-meal-details">' + meal.details.map(d => '<span class="arrow">→</span> ' + d).join('<br>') + '</div>';
+      '<div class="result-meal-details">' + bulkDetails.map(d => '<span class="arrow">→</span> ' + d).join('<br>') + '</div>' +
+      '<div class="prep-batch-macros">' + totalMacros.cal + ' cal · ' + totalMacros.p + 'g protein · ' + totalMacros.c + 'g carbs · ' + totalMacros.f + 'g fat' + (count > 1 ? ' <span style="color:#a8a29e;">(' + meal.macros.cal + ' per serving)</span>' : '') + '</div>';
     mealsContainer.appendChild(card);
   });
 
